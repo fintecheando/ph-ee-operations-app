@@ -10,13 +10,14 @@ fineract:
       protocol: jdbc
       subprotocol: mysql
       driverclass_name: com.mysql.cj.jdbc.Driver
-
+      
 token:
   user:
     access-validity-seconds: 600
     refresh-validity-seconds: 43200
   client:
     access-validity-seconds: 3600
+    secret: "p1234"
 
 config:
   imu:
@@ -55,11 +56,6 @@ logging:
 channel-connector:
   url: http://bb-connector-channel.flexcore.mx
   transfer-path: /channel/transfer
-
-token:
-  client:
-    channel:
-      secret: "p1234"
 
 cloud:
   aws:
