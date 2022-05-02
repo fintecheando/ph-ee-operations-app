@@ -2,7 +2,7 @@ fineract:
   datasource:
     core:
       host: operations-mysql
-      port: 4000
+      port: 3306
       schema: tenants
       username: root
       password: mysql
