@@ -52,6 +52,10 @@ logging:
   level:
     ROOT: ERROR
 
+channel-connector:
+  url: http://bb-connector-channel.flexcore.mx
+  transfer-path: /channel/transfer
+
 cloud:
   aws:
     enabled: true
