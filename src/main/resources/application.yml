@@ -17,7 +17,8 @@ token:
     refresh-validity-seconds: 43200
   client:
     access-validity-seconds: 3600
-    secret: "p1234"
+    channel:
+      secret: "p1234"
 
 config:
   imu:
