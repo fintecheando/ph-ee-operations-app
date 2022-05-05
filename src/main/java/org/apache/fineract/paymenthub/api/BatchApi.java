@@ -1,6 +1,6 @@
 package org.apache.fineract.paymenthub.api;
 
-import org.apache.fineract.operations.*;
+import org.apache.fineract.paymenthub.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;

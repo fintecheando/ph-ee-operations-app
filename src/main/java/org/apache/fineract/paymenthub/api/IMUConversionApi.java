@@ -1,10 +1,10 @@
 package org.apache.fineract.paymenthub.api;
 
-import org.apache.fineract.operations.CurrencyRate;
-import org.apache.fineract.operations.CurrencyRateLock;
-import org.apache.fineract.operations.CurrencyRateLockRepository;
-import org.apache.fineract.operations.CurrencyRateRepository;
 import org.apache.fineract.paymenthub.data.IMUConversionData;
+import org.apache.fineract.paymenthub.domain.CurrencyRate;
+import org.apache.fineract.paymenthub.domain.CurrencyRateLock;
+import org.apache.fineract.paymenthub.domain.CurrencyRateLockRepository;
+import org.apache.fineract.paymenthub.domain.CurrencyRateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -17,6 +17,9 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/v1")
 public class IMUConversionApi {
+
+    private final static String API_PATH = "/imuexchange";
+
     @Autowired
     private CurrencyRateRepository currencyRateRepository;
 
@@ -26,7 +29,7 @@ public class IMUConversionApi {
     @Value("${config.imu.rate-validity-seconds}")
     private Integer imuRateValidSeconds;
 
-    @PostMapping(path = "/imuexchange/preview", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(path = API_PATH + "/preview", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public IMUConversionData create(@RequestBody IMUConversionData imuConversion, HttpServletResponse response) {
         Date currentDate = new Date();
@@ -76,7 +79,7 @@ public class IMUConversionApi {
         return imuConversion;
     }
 
-    @PostMapping(path = "/imuexchange/master", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = API_PATH + "/master", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void create(@RequestBody List<IMUConversionData> exchangeRates, HttpServletResponse response) {
 
         List<CurrencyRate> currencyRates = new ArrayList<>();
@@ -96,7 +99,7 @@ public class IMUConversionApi {
         currencyRateRepository.saveAll(currencyRates);
     }
 
-    @DeleteMapping(path = "/imuexchange/master", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = API_PATH + "/master", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void delete(@RequestBody IMUConversionData imuConversion, HttpServletResponse response) {
         CurrencyRate exchange = currencyRateRepository.findOneByFromCurrencyAndToCurrency(imuConversion.getFrom(), imuConversion.getTo());
         if (exchange != null) {

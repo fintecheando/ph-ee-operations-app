@@ -2,9 +2,8 @@ package org.apache.fineract.paymenthub.api;
 
 import java.util.List;
 
-import org.apache.fineract.operations.ParticipantRepository;
-import org.apache.fineract.operations.Participant;
-
+import org.apache.fineract.paymenthub.domain.Participant;
+import org.apache.fineract.paymenthub.domain.ParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

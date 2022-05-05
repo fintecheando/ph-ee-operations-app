@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.fineract.operations.Beneficiary;
-import org.apache.fineract.operations.BeneficiaryRepository;
+import org.apache.fineract.paymenthub.domain.Beneficiary;
+import org.apache.fineract.paymenthub.domain.BeneficiaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class BeneficiaryApi {
 
+    private final static String API_PATH = "/beneficiary";
+
     @Autowired
     BeneficiaryRepository beneficiaryRepository;
 
-    @PostMapping(path = "/beneficiary", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = API_PATH, consumes = MediaType.APPLICATION_JSON_VALUE)
     public void create(@RequestBody Beneficiary beneficiary, HttpServletResponse response) {
         Beneficiary existing = beneficiaryRepository.findOneByCustIdentifierAndIdentifier(beneficiary.getCustIdentifier(),
                 beneficiary.getIdentifier());
@@ -35,7 +37,7 @@ public class BeneficiaryApi {
         }
     }
 
-    @GetMapping(path = "/beneficiary/{custIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = API_PATH + "/{custIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Beneficiary> getAllForCustomer(@PathVariable("custIdentifier") String custIdentifier, HttpServletResponse response) {
         List<Beneficiary> beneficiaries = beneficiaryRepository.findBycustIdentifier(custIdentifier);
         if(beneficiaries != null) {
@@ -47,7 +49,7 @@ public class BeneficiaryApi {
         }
     }
 
-    @DeleteMapping(path = "/beneficiary/{custIdentifier}/{identifier}", produces = MediaType.TEXT_HTML_VALUE)
+    @DeleteMapping(path = API_PATH + "/{custIdentifier}/{identifier}", produces = MediaType.TEXT_HTML_VALUE)
     public void delete(@PathVariable("custIdentifier") String custIdentifier,
                        @PathVariable("identifier") String identifier, HttpServletResponse response) {
         Beneficiary beneficiary = beneficiaryRepository.findOneByCustIdentifierAndIdentifier(custIdentifier, identifier);

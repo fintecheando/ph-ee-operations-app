@@ -1,4 +1,4 @@
-package org.apache.fineract.operations;
+package org.apache.fineract.paymenthub.domain;
 
 import org.eclipse.persistence.annotations.Index;
 import org.apache.fineract.organisation.parent.AbstractPersistableCustom;

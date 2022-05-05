@@ -30,7 +30,6 @@ import org.apache.fineract.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.service.migration.ExtendedSpringLiquibase;
 import org.apache.fineract.infrastructure.core.service.migration.ExtendedSpringLiquibaseFactory;
-import org.apache.fineract.infrastructure.core.service.migration.SchemaUpgradeNeededException;
 import org.apache.fineract.infrastructure.core.service.migration.TenantDataSourceFactory;
 import org.apache.fineract.infrastructure.core.service.migration.TenantDatabaseStateVerifier;
 import org.apache.fineract.infrastructure.security.service.TenantDetailsService;
@@ -82,7 +81,7 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
             return;
         }
         try {
-            // upgradeTenantStore();
+            upgradeTenantStore();
             upgradeIndividualTenants();
         } catch (LiquibaseException e) {
             throw new RuntimeException("Error while migrating the schema", e);

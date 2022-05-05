@@ -1,4 +1,4 @@
-package org.apache.fineract.operations;
+package org.apache.fineract.paymenthub.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.fineract.organisation.parent.AbstractPersistableCustom;

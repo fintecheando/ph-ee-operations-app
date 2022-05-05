@@ -1,4 +1,4 @@
-package org.apache.fineract.operations;
+package org.apache.fineract.paymenthub.domain;
 
 import java.math.BigDecimal;
 import java.util.Date;

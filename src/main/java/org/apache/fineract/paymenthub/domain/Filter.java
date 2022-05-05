@@ -1,4 +1,4 @@
-package org.apache.fineract.operations;
+package org.apache.fineract.paymenthub.domain;
 
 public enum Filter {
     TRANSACTIONID,

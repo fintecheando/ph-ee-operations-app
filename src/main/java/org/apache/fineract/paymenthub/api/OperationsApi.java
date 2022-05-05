@@ -1,19 +1,19 @@
 package org.apache.fineract.paymenthub.api;
 
 
-import org.apache.fineract.operations.BusinessKey;
-import org.apache.fineract.operations.BusinessKeyRepository;
-import org.apache.fineract.operations.Task;
-import org.apache.fineract.operations.TaskRepository;
-import org.apache.fineract.operations.TransactionRequest;
-import org.apache.fineract.operations.TransactionRequestDetail;
-import org.apache.fineract.operations.TransactionRequestRepository;
-import org.apache.fineract.operations.Transfer;
-import org.apache.fineract.operations.TransferDetail;
-import org.apache.fineract.operations.TransferRepository;
-import org.apache.fineract.operations.TransferStatus;
-import org.apache.fineract.operations.Variable;
-import org.apache.fineract.operations.VariableRepository;
+import org.apache.fineract.paymenthub.domain.BusinessKey;
+import org.apache.fineract.paymenthub.domain.BusinessKeyRepository;
+import org.apache.fineract.paymenthub.domain.Task;
+import org.apache.fineract.paymenthub.domain.TaskRepository;
+import org.apache.fineract.paymenthub.domain.TransactionRequest;
+import org.apache.fineract.paymenthub.domain.TransactionRequestDetail;
+import org.apache.fineract.paymenthub.domain.TransactionRequestRepository;
+import org.apache.fineract.paymenthub.domain.Transfer;
+import org.apache.fineract.paymenthub.domain.TransferDetail;
+import org.apache.fineract.paymenthub.domain.TransferRepository;
+import org.apache.fineract.paymenthub.domain.TransferStatus;
+import org.apache.fineract.paymenthub.domain.Variable;
+import org.apache.fineract.paymenthub.domain.VariableRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -41,6 +41,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1")
 public class OperationsApi {
+    private final static String API_PATH = "/transfer";
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -67,7 +69,7 @@ public class OperationsApi {
     @Value("${channel-connector.transfer-path}")
     private String channelConnectorTransferPath;
 
-    @PostMapping("/transfer/{transactionId}/refund")
+    @PostMapping(API_PATH + "/{transactionId}/refund")
     public String refundTransfer(@RequestHeader("Platform-TenantId") String tenantId,
                                  @PathVariable("transactionId") String transactionId,
                                  @RequestBody String requestBody,
@@ -131,7 +133,7 @@ public class OperationsApi {
         extensionList.put(extension);
     }
 
-    @GetMapping("/transfer/{workflowInstanceKey}")
+    @GetMapping(API_PATH + "/{workflowInstanceKey}")
     public TransferDetail transferDetails(@PathVariable Long workflowInstanceKey) {
         Transfer transfer = transferRepository.findFirstByWorkflowInstanceKey(workflowInstanceKey);
         List<Task> tasks = taskRepository.findByWorkflowInstanceKeyOrderByTimestamp(workflowInstanceKey);

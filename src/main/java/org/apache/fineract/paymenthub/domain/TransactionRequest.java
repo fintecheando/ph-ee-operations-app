@@ -1,4 +1,4 @@
-package org.apache.fineract.operations;
+package org.apache.fineract.paymenthub.domain;
 
 
 
@@ -12,10 +12,11 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+
+import static org.apache.fineract.paymenthub.domain.TransactionRequestState.IN_PROGRESS;
+
 import java.math.BigDecimal;
 import java.util.Date;
-
-import static org.apache.fineract.operations.TransactionRequestState.IN_PROGRESS;
 
 
 @Getter

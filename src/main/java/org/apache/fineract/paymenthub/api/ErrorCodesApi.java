@@ -1,7 +1,7 @@
 package org.apache.fineract.paymenthub.api;
 
-import org.apache.fineract.operations.ErrorCode;
-import org.apache.fineract.operations.ErrorCodeRepository;
+import org.apache.fineract.paymenthub.domain.ErrorCode;
+import org.apache.fineract.paymenthub.domain.ErrorCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
