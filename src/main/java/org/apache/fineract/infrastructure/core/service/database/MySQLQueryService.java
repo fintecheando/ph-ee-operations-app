@@ -2,7 +2,12 @@ package org.apache.fineract.infrastructure.core.service.database;
 
 import static java.lang.String.format;
 
+import java.sql.SQLException;
+
 import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -10,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MySQLQueryService implements DatabaseQueryService {
+    private static final Logger LOG = LoggerFactory.getLogger(MySQLQueryService.class);
 
     private final DatabaseTypeResolver databaseTypeResolver;
 
@@ -27,7 +33,11 @@ public class MySQLQueryService implements DatabaseQueryService {
     public boolean isTablePresent(DataSource dataSource, String tableName) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         SqlRowSet rs = jdbcTemplate.queryForRowSet(format("SHOW TABLES LIKE '%s'", tableName));
-        return rs.next();
+        final boolean isPresent = rs.next();
+        try {
+            LOG.info("Looking Table: {} in {} : {}", tableName, dataSource.getConnection().getSchema(), isPresent);
+        } catch (SQLException e) {}
+        return isPresent;
     }
 
     @Override

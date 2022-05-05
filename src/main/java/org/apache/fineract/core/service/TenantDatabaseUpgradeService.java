@@ -32,12 +32,14 @@ import org.apache.fineract.infrastructure.core.service.migration.ExtendedSpringL
 import org.apache.fineract.infrastructure.core.service.migration.ExtendedSpringLiquibaseFactory;
 import org.apache.fineract.infrastructure.core.service.migration.TenantDataSourceFactory;
 import org.apache.fineract.infrastructure.core.service.migration.TenantDatabaseStateVerifier;
+import org.apache.fineract.infrastructure.core.utils.ProfileUtils;
 import org.apache.fineract.infrastructure.security.service.TenantDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 /**
@@ -57,34 +59,38 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
     private final TenantDatabaseStateVerifier databaseStateVerifier;
     private final ExtendedSpringLiquibaseFactory liquibaseFactory;
     private final TenantDataSourceFactory tenantDataSourceFactory;
+    private final ProfileUtils profileUtils;
 
     @Autowired
     public TenantDatabaseUpgradeService(final TenantDetailsService detailsService,
             @Qualifier("hikariTenantDataSource") final DataSource tenantDataSource, final FineractProperties fineractProperties,
             TenantDatabaseStateVerifier databaseStateVerifier, ExtendedSpringLiquibaseFactory liquibaseFactory,
-            TenantDataSourceFactory tenantDataSourceFactory) {
+            TenantDataSourceFactory tenantDataSourceFactory, final ApplicationContext context) {
         this.tenantDetailsService = detailsService;
         this.tenantDataSource = tenantDataSource;
         this.fineractProperties = fineractProperties;
         this.databaseStateVerifier = databaseStateVerifier;
         this.liquibaseFactory = liquibaseFactory;
         this.tenantDataSourceFactory = tenantDataSourceFactory;
+        this.profileUtils = new ProfileUtils(context.getEnvironment());
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if (databaseStateVerifier.isLiquibaseDisabled() || !fineractProperties.getMode().isWriteEnabled()) {
-            LOG.warn("Liquibase is disabled. Not upgrading any database.");
-            if (!fineractProperties.getMode().isWriteEnabled()) {
-                LOG.warn("Liquibase is disabled because the current instance is configured as a non-write Fineract instance");
+        if (profileUtils.isActiveProfile(profileUtils.SPRING_UPGRADEDB_PROFILE_NAME)) {
+            if (databaseStateVerifier.isLiquibaseDisabled() || !fineractProperties.getMode().isWriteEnabled()) {
+                LOG.warn("Liquibase is disabled. Not upgrading any database.");
+                if (!fineractProperties.getMode().isWriteEnabled()) {
+                    LOG.warn("Liquibase is disabled because the current instance is configured as a non-write Fineract instance");
+                }
+                return;
             }
-            return;
-        }
-        try {
-            upgradeTenantStore();
-            upgradeIndividualTenants();
-        } catch (LiquibaseException e) {
-            throw new RuntimeException("Error while migrating the schema", e);
+            try {
+                upgradeTenantStore();
+                upgradeIndividualTenants();
+            } catch (LiquibaseException e) {
+                throw new RuntimeException("Error while migrating the schema", e);
+            }
         }
     }
 

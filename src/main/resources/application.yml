@@ -59,7 +59,7 @@ spring:
     active: ${FINERACT_ACTIVE_PROFILES:basicauth}
   datasource:
     hikari:
-      driverClassName: ${FINERACT_HIKARI_DRIVER_SOURCE_CLASS_NAME:com.mysql.jdbc.Driver}
+      driverClassName: ${FINERACT_HIKARI_DRIVER_SOURCE_CLASS_NAME:com.mysql.cj.jdbc.Driver}
       jdbcUrl: ${FINERACT_HIKARI_JDBC_URL:jdbc:mariadb://localhost:3306/fineract_tenants}
       username: ${FINERACT_HIKARI_USERNAME:root}
       password: ${FINERACT_HIKARI_PASSWORD:mysql}

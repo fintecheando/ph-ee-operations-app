@@ -40,7 +40,7 @@ public class TenantDataSourceFactory {
         String protocol = toProtocol(tenantDataSource);
         String tenantJdbcUrl = toJdbcUrl(protocol, tenantConnection.getSchemaServer(), tenantConnection.getSchemaServerPort(),
                 tenantConnection.getSchemaName(), tenantConnection.getSchemaConnectionParameters());
-        LOG.debug("JDBC URL for tenant {} is {}", tenant.getTenantIdentifier(), tenantJdbcUrl);
+        LOG.info("JDBC URL for tenant {} is {}", tenant.getTenantIdentifier(), tenantJdbcUrl);
         dataSource.setJdbcUrl(tenantJdbcUrl);
         return dataSource;
     }

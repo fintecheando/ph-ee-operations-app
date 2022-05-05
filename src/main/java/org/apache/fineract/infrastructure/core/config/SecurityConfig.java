@@ -36,6 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatcher("/api/**").authorizeRequests() //
                 .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll() //
                 .antMatchers(HttpMethod.POST, "/api/*/echo").permitAll() //
+                .antMatchers("/actuator/**").permitAll() //
                 .antMatchers("/api/*/twofactor").fullyAuthenticated() //
                 .antMatchers("/api/**").access("isFullyAuthenticated()").and() //
                 .httpBasic() //
