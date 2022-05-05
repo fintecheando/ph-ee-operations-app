@@ -1,6 +1,6 @@
 package org.apache.fineract.core.service;
 
-import org.apache.fineract.organisation.tenant.TenantServerConnection;
+import org.apache.fineract.core.domain.FineractPlatformTenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
@@ -17,13 +17,13 @@ public class AudienceVerifier implements JwtClaimsSetVerifier {
 
     @Override
     public void verify(Map<String, Object> claims) throws InvalidTokenException {
-        TenantServerConnection tenant = ThreadLocalContextUtil.getTenant();
+        FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
         List<String> audiences = (List) claims.get("aud");
         audiences.stream()
-                .filter(a -> tenant.getSchemaName().equals(a))
+                .filter(a -> tenant.getConnection().getSchemaName().equals(a))
                 .findFirst()
                 .orElseThrow(() -> {
-                    String message = "Token audiences " + audiences + " are not matching with request " + tenant.getSchemaName();
+                    String message = "Token audiences " + audiences + " are not matching with request " + tenant.getConnection().getSchemaName();
                     logger.error(message);
                     return new RuntimeException(message);
                 });

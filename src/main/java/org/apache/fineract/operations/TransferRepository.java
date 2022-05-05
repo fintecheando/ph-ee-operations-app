@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
-public interface TransferRepository extends JpaRepository<Transfer, Long>, JpaSpecificationExecutor {
+public interface TransferRepository extends JpaRepository<Transfer, Long>, JpaSpecificationExecutor<Transfer> {
 
     Transfer findFirstByWorkflowInstanceKey(Long workflowInstanceKey);
 

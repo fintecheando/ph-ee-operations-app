@@ -29,7 +29,7 @@ import org.apache.fineract.organisation.parent.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_password_validation_policy")
-public class PasswordValidationPolicy extends AbstractPersistableCustom<Long> {
+public class PasswordValidationPolicy extends AbstractPersistableCustom {
 
     @Column(name = "regex", nullable = false)
     private String regex;

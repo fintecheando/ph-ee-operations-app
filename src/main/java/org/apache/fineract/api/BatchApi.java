@@ -1,9 +1,7 @@
 package org.apache.fineract.api;
 
-import org.apache.fineract.file.FileTransferService;
 import org.apache.fineract.operations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
@@ -27,9 +25,11 @@ public class BatchApi {
     @Autowired
     private BatchRepository batchRepository;
 
+    /*
     @Autowired
     @Qualifier("awsStorage")
     private FileTransferService fileTransferService;
+    */
 
     @Value("${application.bucket-name}")
     private String bucketName;
@@ -67,9 +67,9 @@ public class BatchApi {
         if (status.equalsIgnoreCase(TransferStatus.COMPLETED.toString()) ||
                 status.equalsIgnoreCase(TransferStatus.IN_PROGRESS.toString()) ||
                 status.equalsIgnoreCase(TransferStatus.FAILED.toString())) {
-            transfers = transferRepository.findAllByBatchIdAndStatus(batchId, status.toUpperCase(), new PageRequest(pageNo, pageSize));
+            transfers = transferRepository.findAllByBatchIdAndStatus(batchId, status.toUpperCase(), PageRequest.of(pageNo, pageSize));
         } else {
-            transfers = transferRepository.findAllByBatchId(batchId, new PageRequest(pageNo, pageSize));
+            transfers = transferRepository.findAllByBatchId(batchId, PageRequest.of(pageNo, pageSize));
         }
 
         return new ResponseEntity<List<Transfer>>(transfers, new HttpHeaders(), HttpStatus.OK);
@@ -172,7 +172,7 @@ public class BatchApi {
                 bw.newLine();
             }
             bw.flush();
-            return fileTransferService.uploadFile(tempFile, bucketName);
+            return ""; // fileTransferService.uploadFile(tempFile, bucketName);
         } catch (Exception e) {
             System.err.format("Exception: %s%n", e);
         }

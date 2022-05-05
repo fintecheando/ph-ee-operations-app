@@ -26,7 +26,7 @@ import org.apache.fineract.organisation.parent.AbstractPersistableCustom;
 
 @Entity
 @Table(name = "m_image")
-public final class Image extends AbstractPersistableCustom<Long> {
+public final class Image extends AbstractPersistableCustom {
 
     @Column(name = "location", length = 500)
     private String location;

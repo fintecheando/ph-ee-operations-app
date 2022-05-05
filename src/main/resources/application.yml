@@ -1,15 +1,25 @@
 fineract:
-  datasource:
-    core:
-      host: operations-mysql
-      port: 3306
-      schema: tenants
-      username: root
-      password: mysql
-    common:
-      protocol: jdbc
-      subprotocol: mysql
-      driverclass_name: com.mysql.cj.jdbc.Driver
+  security:
+    basicauth:
+      enabled: true
+  mode:
+    read-enabled: true
+    write-enabled: true
+    batch-enabled: true
+  tenant:
+    host: ${FINERACT_DEFAULT_TENANTDB_HOSTNAME:localhost}
+    port: ${FINERACT_DEFAULT_TENANTDB_PORT:3306}
+    username: ${FINERACT_DEFAULT_TENANTDB_UID:root}
+    password: ${FINERACT_DEFAULT_TENANTDB_PWD:mysql}
+    parameters: ${FINERACT_DEFAULT_TENANTDB_CONN_PARAMS:}
+    timezone: ${FINERACT_DEFAULT_TENANTDB_TIMEZONE:Asia/Kolkata}
+    identifier: ${FINERACT_DEFAULT_TENANTDB_IDENTIFIER:default}
+    name: ${FINERACT_DEFAULT_TENANTDB_NAME:fineract_default}
+    description: ${FINERACT_DEFAULT_TENANTDB_DESCRIPTION:Default Demo Tenant}
+
+logging:
+  level:
+    root: ${FINERACT_CONSOLE_LOG:ERROR}
 
 tenants: "tn01,tn02"
 
@@ -32,6 +42,11 @@ caching:
 security:
   filter-order: 5
 
+server:
+  port: 8000
+  servlet:
+    context-path: ${FINERACT_SERVER_SERVLET_CONTEXT_PATH:/phee}
+
 spring:
   resources:
     add-mappings: false
@@ -40,21 +55,60 @@ spring:
       enabled: false
   jmx:
     enabled: false
+  profiles:
+    active: ${FINERACT_ACTIVE_PROFILES:basicauth}
+  datasource:
+    hikari:
+      driverClassName: ${FINERACT_HIKARI_DRIVER_SOURCE_CLASS_NAME:com.mysql.jdbc.Driver}
+      jdbcUrl: ${FINERACT_HIKARI_JDBC_URL:jdbc:mariadb://localhost:3306/fineract_tenants}
+      username: ${FINERACT_HIKARI_USERNAME:root}
+      password: ${FINERACT_HIKARI_PASSWORD:mysql}
+      minimumIdle: ${FINERACT_HIKARI_MINIMUM_IDLE:3}
+      maximumPoolSize: ${FINERACT_HIKARI_MAXIMUM_POOL_SIZE:10}
+      idleTimeout: ${FINERACT_HIKARI_IDLE_TIMEOUT:60000}
+      connectionTimeout: ${FINERACT_HIKARI_CONNECTION_TIMEOUT:20000}
+      connectionTestquery: ${FINERACT_HIKARI_TEST_QUERY:SELECT 1}
+      autoCommit: ${FINERACT_HIKARI_AUTO_COMMIT:true}
+      dataSourceProperties['cachePrepStmts']: ${FINERACT_HIKARI_DS_PROPERTIES_CACHE_PREP_STMTS:true}
+      dataSourceProperties['prepStmtCacheSize']: ${FINERACT_HIKARI_DS_PROPERTIES_PREP_STMT_CACHE_SIZE:250}
+      dataSourceProperties['prepStmtCacheSqlLimit']: ${FINERACT_HIKARI_DS_PROPERTIES_PREP_STMT_CACHE_SQL_LIMIT:2048}
+      dataSourceProperties['useServerPrepStmts']: ${FINERACT_HIKARI_DS_PROPERTIES_USE_SERVER_PREP_STMTS:true}
+      dataSourceProperties['useLocalSessionState']: ${FINERACT_HIKARI_DS_PROPERTIES_USE_LOCAL_SESSION_STATE:true}
+      dataSourceProperties['rewriteBatchedStatements']: ${FINERACT_HIKARI_DS_PROPERTIES_REWRITE_BATCHED_STATEMENTS:true}
+      dataSourceProperties['cacheResultSetMetadata']: ${FINERACT_HIKARI_DS_PROPERTIES_CACHE_RESULT_SET_METADATA:true}
+      dataSourceProperties['cacheServerConfiguration']: ${FINERACT_HIKARI_DS_PROPERTIES_CACHE_SERVER_CONFIGURATION:true}
+      dataSourceProperties['elideSetAutoCommits']: ${FINERACT_HIKARI_DS_PROPERTIES_ELIDE_SET_AUTO_COMMITS:true}
+      dataSourceProperties['maintainTimeStats']: ${FINERACT_HIKARI_DS_PROPERTIES_MAINTAIN_TIME_STATS:false}
+      dataSourceProperties['logSlowQueries']: ${FINERACT_HIKARI_DS_PROPERTIES_LOG_SLOW_QUERIES:true}
+      dataSourceProperties['dumpQueriesOnException']: ${FINERACT_HIKARI_DS_PROPERTIES_DUMP_QUERIES_IN_EXCEPTION:true}
+  jpa:
+    open-in-view: false
 
-server:
-  port: 5000
+# Liquibase configuration
+  liquibase:
+    enabled: true
+    changeLog: classpath:/db/changelog/db.changelog-master.xml
+    parameters:
+      fineract:
+        tenant:
+          identifier: ${fineract.tenant.identifier}
+          description: ${fineract.tenant.description}
+          timezone: ${fineract.tenant.timezone}
+          schema-name: ${fineract.tenant.name}
+          host: ${fineract.tenant.host}
+          port: ${fineract.tenant.port}
+          username: ${fineract.tenant.username}
+          password: ${fineract.tenant.password}
+          parameters: ${fineract.tenant.parameters}
 
 rest:
   authorization:
-    enabled: true
+    enabled: false
     settings:
       - endpoint: "/api/v1/transfer/*/refund"
         authority: "hasAuthority('REFUND')"
       - endpoint: "/api/v1/**"
         authority: "hasAuthority('ALL_FUNCTIONS')"
-logging:
-  level:
-    ROOT: ERROR
 
 channel-connector:
   url: http://bb-connector-channel.flexcore.mx
@@ -62,7 +116,7 @@ channel-connector:
 
 cloud:
   aws:
-    enabled: true
+    enabled: false
     credentials:
       access-key: ${AWS_ACCESS_KEY:AKIAX32JM37TZOJ5AKFB}
       secret-key: ${AWS_SECRET_KEY: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}
@@ -77,3 +131,6 @@ cloud:
 
 application:
   bucket-name: paymenthub-ee-dev
+
+
+

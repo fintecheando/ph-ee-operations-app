@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "m_appuser")
-public class AppUser extends AbstractPersistableCustom<Long> implements UserDetails {
+public class AppUser extends AbstractPersistableCustom implements UserDetails {
 
     @Column(name = "email", nullable = false, length = 100)
     private String email;

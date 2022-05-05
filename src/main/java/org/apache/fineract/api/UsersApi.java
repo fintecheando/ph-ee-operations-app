@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.fineract.api.AssignmentAction.ASSIGN;
@@ -62,9 +63,9 @@ public class UsersApi {
 
     @GetMapping(path = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public AppUser retrieveOne(@PathVariable("userId") Long userId, HttpServletResponse response) {
-        AppUser user = appuserRepository.findOne(userId);
-        if(user != null) {
-            return user;
+        Optional<AppUser> optEntity = appuserRepository.findById(userId);
+        if (optEntity.isPresent()) {
+            return optEntity.get();
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -73,9 +74,9 @@ public class UsersApi {
 
     @GetMapping(path = "/user/{userId}/roles", produces = MediaType.APPLICATION_JSON_VALUE)
     public Collection<Role> retrieveRoles(@PathVariable("userId") Long userId, HttpServletResponse response) {
-        AppUser user = appuserRepository.findOne(userId);
-        if(user != null) {
-            return user.getRoles();
+        Optional<AppUser> optEntity = appuserRepository.findById(userId);
+        if (optEntity.isPresent()) {
+            return optEntity.get().getRoles();
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -97,8 +98,9 @@ public class UsersApi {
 
     @PutMapping(path = "/user/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void update(@PathVariable("userId") Long userId, @RequestBody AppUser appUser, HttpServletResponse response) {
-        AppUser existing = appuserRepository.findOne(userId);
-        if (existing != null) {
+        Optional<AppUser> optEntity = appuserRepository.findById(userId);
+        if (optEntity.isPresent()) {
+            AppUser existing = optEntity.get();
             appUser.setId(userId);
             appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
             appUser.setRoles(existing.getRoles());
@@ -110,8 +112,9 @@ public class UsersApi {
 
     @DeleteMapping(path = "/user/{userId}", produces = MediaType.TEXT_HTML_VALUE)
     public void delete(@PathVariable("userId") Long userId, HttpServletResponse response) {
-        if(appuserRepository.exists(userId)) {
-            appuserRepository.delete(userId);
+        Optional<AppUser> optEntity = appuserRepository.findById(userId);
+        if (optEntity.isPresent()) {
+            appuserRepository.delete(optEntity.get());
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -120,8 +123,9 @@ public class UsersApi {
     @PutMapping(path = "/user/{userId}/roles", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void userAssignment(@PathVariable("userId") Long userId, @RequestParam("action") AssignmentAction action,
                                @RequestBody EntityAssignments assignments, HttpServletResponse response) {
-        AppUser existingUser = appuserRepository.findOne(userId);
-        if (existingUser != null) {
+        Optional<AppUser> optEntity = appuserRepository.findById(userId);
+        if (optEntity.isPresent()) {
+            AppUser existingUser = optEntity.get();
             Collection<Role> rolesToAssign = existingUser.getRoles();
             List<Long> existingRoleIds = rolesToAssign.stream()
                     .map(Role::getId)
@@ -135,11 +139,11 @@ public class UsersApi {
                         }
                     })
                     .map(id -> {
-                        Role r = roleRepository.findOne(id);
-                        if (r == null) {
+                        Optional<Role> optRole = roleRepository.findById(id);
+                        if (!optRole.isPresent()) {
                             throw new RuntimeException("Invalid role id: " + id + " can not continue assignment!");
                         } else {
-                            return r;
+                            return optRole.get();
                         }
                     }).collect(toList());
 

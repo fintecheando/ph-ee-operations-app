@@ -29,7 +29,7 @@ import java.io.Serializable;
 
 
 @MappedSuperclass
-public abstract class AbstractPersistableCustom<PK extends Serializable> implements Persistable<Long> {
+public abstract class AbstractPersistableCustom implements Persistable<Long>, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

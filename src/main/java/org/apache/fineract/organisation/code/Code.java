@@ -31,7 +31,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "m_code", uniqueConstraints = { @UniqueConstraint(columnNames = { "code_name" }, name = "code_name") })
-public class Code extends AbstractPersistableCustom<Long> {
+public class Code extends AbstractPersistableCustom {
 
     @Column(name = "code_name", length = 100)
     private String name;

@@ -35,7 +35,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "m_office")
-public class Office extends AbstractPersistableCustom<Long> {
+public class Office extends AbstractPersistableCustom {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")

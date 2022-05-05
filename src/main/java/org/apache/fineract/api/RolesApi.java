@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.apache.fineract.api.AssignmentAction.ASSIGN;
@@ -59,9 +60,9 @@ public class RolesApi {
 
     @GetMapping(path = "/role/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Role retrieveOne(@PathVariable("roleId") Long roleId, HttpServletResponse response) {
-        Role role = roleRepository.findOne(roleId);
-        if(role != null) {
-            return role;
+        Optional<Role> optEntity = roleRepository.findById(roleId);
+        if(optEntity.isPresent()) {
+            return optEntity.get();
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -70,9 +71,9 @@ public class RolesApi {
 
     @GetMapping(path = "/role/{roleId}/permissions", produces = MediaType.APPLICATION_JSON_VALUE)
     public Collection<Permission> retrievePermissions(@PathVariable("roleId") Long roleId, HttpServletResponse response) {
-        Role role = roleRepository.findOne(roleId);
-        if(role != null) {
-            return role.getPermissions();
+        Optional<Role> optEntity = roleRepository.findById(roleId);
+        if(optEntity.isPresent()) {
+            return optEntity.get().getPermissions();
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return null;
@@ -92,8 +93,9 @@ public class RolesApi {
 
     @PutMapping(path = "/role/{roleId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void update(@PathVariable("roleId") Long roleId, @RequestBody Role role, HttpServletResponse response) {
-        Role existing = roleRepository.findOne(roleId);
-        if (existing != null) {
+        Optional<Role> optEntity = roleRepository.findById(roleId);
+        if(optEntity.isPresent()) {
+            Role existing = optEntity.get();
             role.setId(roleId);
             role.setAppUsers(existing.getAppusers());
             role.setPermissions(existing.getPermissions());
@@ -105,8 +107,9 @@ public class RolesApi {
 
     @DeleteMapping(path = "/role/{roleId}")
     public void delete(@PathVariable("roleId") Long roleId, HttpServletResponse response) {
-        if(roleRepository.exists(roleId)) {
-            roleRepository.delete(roleId);
+        Optional<Role> optEntity = roleRepository.findById(roleId);
+        if(optEntity.isPresent()) {
+            roleRepository.delete(optEntity.get());
         } else {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -115,8 +118,9 @@ public class RolesApi {
     @PutMapping(path = "/role/{roleId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void permissionAssignment(@PathVariable("roleId") Long roleId, @RequestParam("action") AssignmentAction action,
                                      @RequestBody EntityAssignments assignments, HttpServletResponse response) {
-        Role existingRole = roleRepository.findOne(roleId);
-        if (existingRole != null) {
+        Optional<Role> optEntity = roleRepository.findById(roleId);
+        if(optEntity.isPresent()) {
+            Role existingRole = optEntity.get();
             Collection<Permission> permissionToAssign = existingRole.getPermissions();
             List<Long> existingPermissionIds = permissionToAssign.stream()
                     .map(Permission::getId)
@@ -130,11 +134,11 @@ public class RolesApi {
                         }
                     })
                     .map(id -> {
-                        Permission p = permissionRepository.findOne(id);
-                        if (p == null) {
+                        Optional<Permission> optPermission = permissionRepository.findById(id);
+                        if (!optPermission.isPresent()) {
                             throw new RuntimeException("Invalid permission id: " + id + " can not continue assignment!");
                         } else {
-                            return p;
+                            return optPermission.get();
                         }
                     }).collect(toList());
 

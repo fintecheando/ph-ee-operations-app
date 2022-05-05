@@ -2,6 +2,7 @@ package org.apache.fineract.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Configuration
 @EnableResourceServer
+@ConditionalOnProperty("fineract.security.oauth.enabled")
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     public static final String IDENTITY_PROVIDER_RESOURCE_ID = "identity-provider";

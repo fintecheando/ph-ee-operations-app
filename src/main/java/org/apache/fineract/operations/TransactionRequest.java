@@ -4,6 +4,9 @@ package org.apache.fineract.operations;
 
 import org.apache.fineract.organisation.parent.AbstractPersistableCustom;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -15,9 +18,11 @@ import java.util.Date;
 import static org.apache.fineract.operations.TransactionRequestState.IN_PROGRESS;
 
 
+@Getter
+@Setter
 @Entity
-@Table(name = "transaction_requests")
-public class TransactionRequest extends AbstractPersistableCustom<Long> {
+@Table(name = "ph_transaction_requests")
+public class TransactionRequest extends AbstractPersistableCustom {
 
     @Column(name = "WORKFLOW_INSTANCE_KEY")
     private String workflowInstanceKey;
@@ -81,173 +86,5 @@ public class TransactionRequest extends AbstractPersistableCustom<Long> {
     public TransactionRequest(String workflowInstanceKey) {
         this.workflowInstanceKey = workflowInstanceKey;
         this.state = IN_PROGRESS;
-    }
-
-    public String getWorkflowInstanceKey() {
-        return workflowInstanceKey;
-    }
-
-    public void setWorkflowInstanceKey(String workflowInstanceKey) {
-        this.workflowInstanceKey = workflowInstanceKey;
-    }
-
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
-    public Date getStartedAt() {
-        return startedAt;
-    }
-
-    public void setStartedAt(Date startedAt) {
-        this.startedAt = startedAt;
-    }
-
-    public Date getCompletedAt() {
-        return completedAt;
-    }
-
-    public void setCompletedAt(Date completedAt) {
-        this.completedAt = completedAt;
-    }
-
-    public TransactionRequestState getState() {
-        return state;
-    }
-
-    public void setState(TransactionRequestState state) {
-        this.state = state;
-    }
-
-    public String getPayeeDfspId() {
-        return payeeDfspId;
-    }
-
-    public void setPayeeDfspId(String payeeDfspId) {
-        this.payeeDfspId = payeeDfspId;
-    }
-
-    public String getPayeePartyId() {
-        return payeePartyId;
-    }
-
-    public void setPayeePartyId(String payeePartyId) {
-        this.payeePartyId = payeePartyId;
-    }
-
-    public String getPayeePartyIdType() {
-        return payeePartyIdType;
-    }
-
-    public void setPayeePartyIdType(String payeePartyIdType) {
-        this.payeePartyIdType = payeePartyIdType;
-    }
-
-    public BigDecimal getPayeeFee() {
-        return payeeFee;
-    }
-
-    public void setPayeeFee(BigDecimal payeeFee) {
-        this.payeeFee = payeeFee;
-    }
-
-    public String getPayeeQuoteCode() {
-        return payeeQuoteCode;
-    }
-
-    public void setPayeeQuoteCode(String payeeQuoteCode) {
-        this.payeeQuoteCode = payeeQuoteCode;
-    }
-
-    public String getPayerDfspId() {
-        return payerDfspId;
-    }
-
-    public void setPayerDfspId(String payerDfspId) {
-        this.payerDfspId = payerDfspId;
-    }
-
-    public String getPayerPartyId() {
-        return payerPartyId;
-    }
-
-    public void setPayerPartyId(String payerPartyId) {
-        this.payerPartyId = payerPartyId;
-    }
-
-    public String getPayerPartyIdType() {
-        return payerPartyIdType;
-    }
-
-    public void setPayerPartyIdType(String payerPartyIdType) {
-        this.payerPartyIdType = payerPartyIdType;
-    }
-
-    public BigDecimal getPayerFee() {
-        return payerFee;
-    }
-
-    public void setPayerFee(BigDecimal payerFee) {
-        this.payerFee = payerFee;
-    }
-
-    public String getPayerQuoteCode() {
-        return payerQuoteCode;
-    }
-
-    public void setPayerQuoteCode(String payerQuoteCode) {
-        this.payerQuoteCode = payerQuoteCode;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public String getDirection() {
-        return direction;
-    }
-
-    public void setDirection(String direction) {
-        this.direction = direction;
-    }
-
-    public String getAuthType() {
-        return authType;
-    }
-
-    public void setAuthType(String authType) {
-        this.authType = authType;
-    }
-
-    public String getInitiatorType() {
-        return initiatorType;
-    }
-
-    public void setInitiatorType(String initiatorType) {
-        this.initiatorType = initiatorType;
-    }
-
-    public String getScenario() {
-        return scenario;
-    }
-
-    public void setScenario(String scenario) {
-        this.scenario = scenario;
     }
 }

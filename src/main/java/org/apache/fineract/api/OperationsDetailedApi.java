@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
@@ -55,7 +55,7 @@ public class OperationsDetailedApi {
             @RequestParam(value = "partyId", required = false) String partyId,
             @RequestParam(value = "partyIdType", required = false) String partyIdType,
             @RequestParam(value = "sortedOrder", required = false, defaultValue = "DESC") String sortedOrder) {
-        List<Specifications<Transfer>> specs = new ArrayList<>();
+        List<Specification<Transfer>> specs = new ArrayList<>();
 
         if (payerPartyId != null) {
             if (payerPartyId.contains("%2B")) {
@@ -128,13 +128,13 @@ public class OperationsDetailedApi {
 
         PageRequest pager;
         if (sortedBy == null || "startedAt".equals(sortedBy)) {
-            pager = new PageRequest(page, size, new Sort(Sort.Direction.fromString(sortedOrder), "startedAt"));
+            pager = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortedOrder), "startedAt"));
         } else {
-            pager = new PageRequest(page, size, new Sort(Sort.Direction.fromString(sortedOrder), sortedBy));
+            pager = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortedOrder), sortedBy));
         }
 
         if (specs.size() > 0) {
-            Specifications<Transfer> compiledSpecs = specs.get(0);
+            Specification<Transfer> compiledSpecs = specs.get(0);
             for (int i = 1; i < specs.size(); i++) {
                 compiledSpecs = compiledSpecs.and(specs.get(i));
             }
@@ -162,7 +162,7 @@ public class OperationsDetailedApi {
             @RequestParam(value = "direction", required = false) String direction,
             @RequestParam(value = "sortedBy", required = false) String sortedBy,
             @RequestParam(value = "sortedOrder", required = false, defaultValue = "DESC") String sortedOrder) {
-        List<Specifications<TransactionRequest>> specs = new ArrayList<>();
+        List<Specification<TransactionRequest>> specs = new ArrayList<>();
         if (payerPartyId != null) {
             specs.add(TransactionRequestSpecs.match(TransactionRequest_.payerPartyId, payerPartyId));
         }
@@ -204,13 +204,13 @@ public class OperationsDetailedApi {
 
         PageRequest pager;
         if (sortedBy == null || "startedAt".equals(sortedBy)) {
-            pager = new PageRequest(page, size, new Sort(Sort.Direction.valueOf(sortedOrder), "startedAt"));
+            pager = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(sortedOrder), "startedAt"));
         } else {
-            pager = new PageRequest(page, size, new Sort(Sort.Direction.valueOf(sortedOrder), sortedBy));
+            pager = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(sortedOrder), sortedBy));
         }
 
         if (specs.size() > 0) {
-            Specifications<TransactionRequest> compiledSpecs = specs.get(0);
+            Specification<TransactionRequest> compiledSpecs = specs.get(0);
             for (int i = 1; i < specs.size(); i++) {
                 compiledSpecs = compiledSpecs.and(specs.get(i));
             }
@@ -247,7 +247,7 @@ public class OperationsDetailedApi {
             return  res;
         }
 
-        Specifications<TransactionRequest> spec = null;
+        Specification<TransactionRequest> spec = null;
         Filter filter;
         try {
             filter = parseFilter(filterBy);
@@ -273,7 +273,7 @@ public class OperationsDetailedApi {
                 spec = TransactionRequestSpecs.in(TransactionRequest_.workflowInstanceKey, ids);
                 break;
         }
-        PageRequest pager = new PageRequest(page, size, new Sort(Sort.Direction.valueOf(sortedOrder), "startedAt"));
+        PageRequest pager = PageRequest.of(page, size, Sort.by(Sort.Direction.valueOf(sortedOrder), "startedAt"));
         Page<TransactionRequest> result;
         if(spec == null) {
             result = transactionRequestRepository.findAll(pager);

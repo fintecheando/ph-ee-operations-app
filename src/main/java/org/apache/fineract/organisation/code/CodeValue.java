@@ -29,7 +29,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "m_code_value", uniqueConstraints = { @UniqueConstraint(columnNames = { "code_id", "code_value" }, name = "code_value_duplicate") })
-public class CodeValue extends AbstractPersistableCustom<Long> {
+public class CodeValue extends AbstractPersistableCustom {
 
     @Column(name = "code_value", length = 100)
     private String label;

@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "m_beneficiary")
-public class Beneficiary extends AbstractPersistableCustom<Long> {
+public class Beneficiary extends AbstractPersistableCustom {
     @Column(name = "c_identifier")
     private String custIdentifier;
 

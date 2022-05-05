@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "m_currency_rates")
-public class CurrencyRate extends AbstractPersistableCustom<Long> {
+public class CurrencyRate extends AbstractPersistableCustom {
     @Column(name = "from_currency")
     private String fromCurrency;
 

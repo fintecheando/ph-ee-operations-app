@@ -29,7 +29,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "m_appuser_previous_password")
-public class AppUserPreviousPassword extends AbstractPersistableCustom<Long> {
+public class AppUserPreviousPassword extends AbstractPersistableCustom {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;

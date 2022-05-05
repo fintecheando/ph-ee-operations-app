@@ -16,30 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.core.service;
+package org.apache.fineract.infrastructure.core.service;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import javax.sql.DataSource;
+
+import org.apache.fineract.core.service.RoutingDataSourceServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
-
-@Service
+@Service(value = "routingDataSource")
 public class RoutingDataSource extends AbstractDataSource {
 
     @Autowired
-    private DataSourcePerTenantService dataSourcePerTenantService;
+    private RoutingDataSourceServiceFactory dataSourceServiceFactory;
 
     @Override
     public Connection getConnection() throws SQLException {
-        return dataSourcePerTenantService.retrieveDataSource().getConnection();
+        return determineTargetDataSource().getConnection();
+    }
+
+    public DataSource determineTargetDataSource() {
+        return this.dataSourceServiceFactory.determineDataSourceService().retrieveDataSource();
     }
 
     @Override
     public Connection getConnection(final String username, final String password) throws SQLException {
-        return dataSourcePerTenantService.retrieveDataSource().getConnection(username, password);
+        return determineTargetDataSource().getConnection(username, password);
     }
-
 }

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements. See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership. The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations
+    under the License.
+
+-->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="fineract" id="ph_0001_1">
+        <createTable tableName="ph_businesskeys">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="BUSINESS_KEY" type="VARCHAR(256)" />
+            <column name="BUSINESS_KEY_TYPE" type="VARCHAR(256)" />
+            <column name="TIMESTAMP" type="BIGINT" />
+            <column name="WORKFLOW_INSTANCE_KEY" type="BIGINT" />
+        </createTable>
+        <createTable tableName="ph_tasks">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="ELEMENT_ID" type="VARCHAR(256)" />
+            <column name="INTENT" type="VARCHAR(256)" />
+            <column name="RECORD_TYPE" type="VARCHAR(256)" />
+            <column name="TIMESTAMP" type="BIGINT" />
+            <column name="TYPE" type="VARCHAR(256)" />
+            <column name="WORKFLOW_INSTANCE_KEY" type="BIGINT" />
+            <column name="WORKFLOW_KEY" type="BIGINT" />
+        </createTable>
+        <createTable tableName="ph_transfers">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="AMOUNT" type="DECIMAL(19, 6)" />
+            <column name="CURRENCY" type="VARCHAR(3)" />
+            <column name="STARTED_AT" type="datetime" />
+            <column name="COMPLETED_AT" type="datetime" />
+            <column name="DIRECTION" type="VARCHAR(10)" />
+            <column name="PAYEE_DFSP_ID" type="VARCHAR(256)" />
+            <column name="PAYEE_FEE" type="DECIMAL(19, 6)" />
+            <column name="PAYEE_FEE_CURRENCY" type="VARCHAR(3)" />
+            <column name="PAYEE_PARTY_ID" type="VARCHAR(256)" />
+            <column name="PAYEE_PARTY_ID_TYPE" type="VARCHAR(256)" />
+            <column name="PAYEE_QUOTE_CODE" type="VARCHAR(256)" />
+            <column name="PAYER_DFSP_ID" type="VARCHAR(256)" />
+            <column name="PAYER_FEE" type="DECIMAL(19, 6)" />
+            <column name="PAYER_FEE_CURRENCY" type="VARCHAR(3)" />
+            <column name="PAYER_PARTY_ID" type="VARCHAR(256)" />
+            <column name="PAYER_PARTY_ID_TYPE" type="VARCHAR(256)" />
+            <column name="PAYER_QUOTE_CODE" type="VARCHAR(256)" />
+            <column name="STATUS" type="VARCHAR(256)" />
+            <column name="STATUS_DETAIL" type="VARCHAR(256)" />
+            <column name="TRANSACTION_ID" type="VARCHAR(256)" />
+            <column name="WORKFLOW_INSTANCE_KEY" type="BIGINT" />
+            <column name="ERROR_INFORMATION" type="TEXT" />
+            <column name="BATCH_ID" type="VARCHAR(256)" />
+        </createTable>
+        <createTable tableName="ph_transaction_requests">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="AMOUNT" type="DECIMAL(19, 6)" />
+            <column name="CURRENCY" type="VARCHAR(3)" />
+            <column name="STARTED_AT" type="datetime" />
+            <column name="COMPLETED_AT" type="datetime" />
+            <column name="DIRECTION" type="VARCHAR(10)" />
+            <column name="PAYEE_DFSP_ID" type="VARCHAR(256)" />
+            <column name="PAYEE_FEE" type="DECIMAL(19, 6)" />
+            <column name="PAYEE_PARTY_ID" type="VARCHAR(256)" />
+            <column name="PAYEE_PARTY_ID_TYPE" type="VARCHAR(256)" />
+            <column name="PAYEE_QUOTE_CODE" type="VARCHAR(256)" />
+            <column name="PAYER_DFSP_ID" type="VARCHAR(256)" />
+            <column name="PAYER_FEE" type="DECIMAL(19, 6)" />
+            <column name="PAYER_PARTY_ID" type="VARCHAR(256)" />
+            <column name="PAYER_PARTY_ID_TYPE" type="VARCHAR(256)" />
+            <column name="PAYER_QUOTE_CODE" type="VARCHAR(256)" />
+            <column name="STATE" type="VARCHAR(256)" />
+            <column name="TRANSACTION_ID" type="VARCHAR(256)" />
+            <column name="WORKFLOW_INSTANCE_KEY" type="BIGINT" />
+            <column name="AUTH_TYPE" type="VARCHAR(256)" />
+            <column name="INITIATOR_TYPE" type="VARCHAR(256)" />
+            <column name="SCENARIO" type="VARCHAR(256)" />
+        </createTable>
+        <createTable tableName="ph_variables">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="NAME" type="VARCHAR(256)" />
+            <column name="TIMESTAMP" type="BIGINT" />
+            <column name="VALUE" type="TEXT" />
+            <column name="WORKFLOW_INSTANCE_KEY" type="BIGINT" />
+            <column name="WORKFLOW_KEY" type="BIGINT" />
+        </createTable>
+        <createIndex indexName="idx_businessKey" tableName="ph_businesskeys">
+            <column name="BUSINESS_KEY"/>
+        </createIndex>
+        <createIndex indexName="idx_workflowInstanceKey" tableName="ph_businesskeys">
+            <column name="WORKFLOW_INSTANCE_KEY"/>
+        </createIndex>
+        <createIndex indexName="idx_businessKeyType" tableName="ph_businesskeys">
+            <column name="BUSINESS_KEY_TYPE"/>
+        </createIndex>
+        <createIndex indexName="idx_tasks_workflowInstanceKey" tableName="ph_tasks">
+            <column name="WORKFLOW_INSTANCE_KEY"/>
+        </createIndex>
+        <createIndex indexName="idx_transfers_workflowInstanceKey" tableName="ph_transfers">
+            <column name="WORKFLOW_INSTANCE_KEY"/>
+        </createIndex>
+        <createIndex indexName="idx_tx_requests_workflowInstanceKey" tableName="ph_transaction_requests">
+            <column name="WORKFLOW_INSTANCE_KEY"/>
+        </createIndex>
+        <createIndex indexName="idx_variables_workflowInstanceKey" tableName="ph_variables">
+            <column name="WORKFLOW_INSTANCE_KEY"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="fineract" id="ph_0001_2">
+        <createTable tableName="m_currency_rates">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="from_currency" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="to_currency" type="VARCHAR(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rate" type="DECIMAL(19,6)" defaultValueNumeric="0.000000" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="datetime" />
+        </createTable>
+        <addUniqueConstraint columnNames="from_currency, to_currency" constraintName="exchange_UNIQUE" tableName="m_currency_rates"/>
+    </changeSet>
+    <changeSet author="fineract" id="ph_0001_3">
+        <createTable tableName="m_beneficiary">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="c_identifier" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="b_name" type="VARCHAR(100)" />
+            <column name="b_nick_name" type="VARCHAR(100)" />
+            <column name="b_identifier" type="VARCHAR(100)" />
+            <column name="b_account_no" type="VARCHAR(100)" />
+            <column name="b_leId" type="VARCHAR(100)" />
+            <column name="b_currency_code" type="VARCHAR(3)" />
+            <column name="b_country_code" type="VARCHAR(10)" />
+        </createTable>
+        <addUniqueConstraint columnNames="c_identifier, b_identifier" constraintName="beneficiary_UNIQUE" tableName="m_beneficiary"/>
+    </changeSet>
+    <changeSet author="fineract" id="ph_0001_4">
+        <createTable tableName="m_currency_rates_lock">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="unique_key" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="from_currency" type="VARCHAR(3)" />
+            <column name="to_currency" type="VARCHAR(3)" />
+            <column name="rate" type="DECIMAL(19,6)" defaultValueNumeric="0.000000" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="fineract" id="ph_0001_5">
+        <createTable tableName="ph_batches">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="BATCH_ID" type="VARCHAR(256)" />
+            <column name="REQUEST_ID" type="VARCHAR(256)" />
+            <column name="REQUEST_FILE" type="VARCHAR(256)" />
+            <column name="TOTAL_TRANSACTIONS" type="BIGINT" />
+            <column name="ONGOING" type="BIGINT" />
+            <column name="FAILED" type="BIGINT" />
+            <column name="COMPLETED" type="BIGINT" />
+            <column name="RESULT_FILE" type="VARCHAR(256)" />
+            <column name="RESULT_GENERATED_AT" type="datetime" />
+            <column name="NOTE" type="VARCHAR(256)" />
+            <column name="WORKFLOW_INSTANCE_KEY" type="BIGINT" />
+            <column name="WORKFLOW_KEY" type="BIGINT" />
+            <column name="STARTED_AT" type="datetime" />
+            <column name="COMPLETED_AT" type="datetime" />
+        </createTable>
+        <createIndex indexName="idx_batches_key" tableName="ph_batches">
+            <column name="WORKFLOW_INSTANCE_KEY"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="fineract" id="ph_0001_6">
+        <createTable tableName="ph_errorcode">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="TRANSACTION_TYPE" type="TEXT" />
+            <column name="ERROR_MESSAGE" type="TEXT" />
+            <column name="ERROR_CODE" type="TEXT" />
+            <column name="WORKFLOW_INSTANCE_KEY" type="BIGINT" />
+            <column defaultValueBoolean="false" name="RECOVERABLE" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="fineract" id="ph_0001_7">
+        <createTable tableName="ph_participants">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(256)" >
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

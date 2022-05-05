@@ -1,8 +1,6 @@
 package org.apache.fineract.api;
 
 
-import org.apache.fineract.operations.Batch;
-import org.apache.fineract.operations.BatchRepository;
 import org.apache.fineract.operations.BusinessKey;
 import org.apache.fineract.operations.BusinessKeyRepository;
 import org.apache.fineract.operations.Task;
@@ -37,7 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,10 +58,7 @@ public class OperationsApi {
     @Autowired
     private TransactionRequestRepository transactionRequestRepository;
 
-    @Autowired
-    private BatchRepository batchRepository;
-
-    @Autowired
+    // @Autowired
     private RestTemplate restTemplate;
 
     @Value("${channel-connector.url}")

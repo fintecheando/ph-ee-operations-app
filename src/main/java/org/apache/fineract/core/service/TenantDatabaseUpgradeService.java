@@ -18,126 +18,138 @@
  */
 package org.apache.fineract.core.service;
 
-import com.googlecode.flyway.core.Flyway;
-import org.apache.fineract.organisation.tenant.TenantServerConnection;
-import org.apache.fineract.organisation.tenant.TenantServerConnectionRepository;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
+import java.util.List;
+import java.util.function.Function;
+import javax.sql.DataSource;
+import liquibase.exception.LiquibaseException;
+import liquibase.integration.spring.SpringLiquibase;
+
+import org.apache.fineract.core.domain.FineractPlatformTenant;
+import org.apache.fineract.infrastructure.core.config.FineractProperties;
+import org.apache.fineract.infrastructure.core.service.migration.ExtendedSpringLiquibase;
+import org.apache.fineract.infrastructure.core.service.migration.ExtendedSpringLiquibaseFactory;
+import org.apache.fineract.infrastructure.core.service.migration.SchemaUpgradeNeededException;
+import org.apache.fineract.infrastructure.core.service.migration.TenantDataSourceFactory;
+import org.apache.fineract.infrastructure.core.service.migration.TenantDatabaseStateVerifier;
+import org.apache.fineract.infrastructure.security.service.TenantDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.apache.fineract.config.ResourceServerConfig.IDENTITY_PROVIDER_RESOURCE_ID;
-
+/**
+ * A service that picks up on tenants that are configured to auto-update their specific schema on application startup.
+ */
 @Service
-public class TenantDatabaseUpgradeService {
+public class TenantDatabaseUpgradeService implements InitializingBean {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(TenantDatabaseUpgradeService.class);
+    private static final String TENANT_STORE_DB_CONTEXT = "tenant_store_db";
+    private static final String INITIAL_SWITCH_CONTEXT = "initial_switch";
+    private static final String TENANT_DB_CONTEXT = "tenant_db";
+
+    private final TenantDetailsService tenantDetailsService;
+    private final DataSource tenantDataSource;
+    private final FineractProperties fineractProperties;
+    private final TenantDatabaseStateVerifier databaseStateVerifier;
+    private final ExtendedSpringLiquibaseFactory liquibaseFactory;
+    private final TenantDataSourceFactory tenantDataSourceFactory;
 
     @Autowired
-    private TenantServerConnectionRepository repository;
-
-    @Autowired
-    private DataSourcePerTenantService dataSourcePerTenantService;
-
-    @Value("${fineract.datasource.core.host}")
-    private String hostname;
-
-    @Value("${fineract.datasource.core.port}")
-    private int port;
-
-    @Value("${fineract.datasource.core.username}")
-    private String username;
-
-    @Value("${fineract.datasource.core.password}")
-    private String password;
-
-    @Value("${fineract.datasource.common.protocol}")
-    private String jdbcProtocol;
-
-    @Value("${fineract.datasource.common.subprotocol}")
-    private String jdbcSubprotocol;
-
-    @Value("${fineract.datasource.common.driverclass_name}")
-    private String driverClass;
-
-    @Value("${token.user.access-validity-seconds}")
-    private String userTokenAccessValiditySeconds;
-
-    @Value("${token.user.refresh-validity-seconds}")
-    private String userTokenRefreshValiditySeconds;
-
-    @Value("${token.client.access-validity-seconds}")
-    private String clientAccessTokenValidity;
-
-    @Value("${token.client.channel.secret}")
-    private String channelClientSecret;
-
-    @Value("#{'${tenants}'.split(',')}")
-    private List<String> tenants;
-
-    @PostConstruct
-    public void setupEnvironment() {
-        flywayDefaultSchema();
-        insertTenants();
-        flywayTenants();
+    public TenantDatabaseUpgradeService(final TenantDetailsService detailsService,
+            @Qualifier("hikariTenantDataSource") final DataSource tenantDataSource, final FineractProperties fineractProperties,
+            TenantDatabaseStateVerifier databaseStateVerifier, ExtendedSpringLiquibaseFactory liquibaseFactory,
+            TenantDataSourceFactory tenantDataSourceFactory) {
+        this.tenantDetailsService = detailsService;
+        this.tenantDataSource = tenantDataSource;
+        this.fineractProperties = fineractProperties;
+        this.databaseStateVerifier = databaseStateVerifier;
+        this.liquibaseFactory = liquibaseFactory;
+        this.tenantDataSourceFactory = tenantDataSourceFactory;
     }
 
-    private void flywayTenants() {
-        for (TenantServerConnection tenant : repository.findAll()) {
-            if (tenant.isAutoUpdateEnabled()) {
-                try {
-                    ThreadLocalContextUtil.setTenant(tenant);
-                    final Flyway fw = new Flyway();
-                    fw.setDataSource(dataSourcePerTenantService.retrieveDataSource());
-                    fw.setLocations("sql/migrations/tenant");
-                    fw.setInitOnMigrate(true);
-                    fw.setOutOfOrder(true);
-                    Map<String, String> placeholders = new HashMap<>();
-                    placeholders.put("tenantDatabase", tenant.getSchemaName()); // add tenant as aud claim
-                    placeholders.put("userAccessTokenValidity", userTokenAccessValiditySeconds);
-                    placeholders.put("userRefreshTokenValidity", userTokenRefreshValiditySeconds);
-                    placeholders.put("clientAccessTokenValidity", clientAccessTokenValidity);
-                    placeholders.put("channelClientSecret", channelClientSecret);
-                    placeholders.put("identityProviderResourceId", IDENTITY_PROVIDER_RESOURCE_ID); // add identity provider as aud claim
-                    fw.setPlaceholders(placeholders);
-                    fw.migrate();
-                } catch (Exception e) {
-                    logger.error("Error when running flyway on tenant: {}", tenant.getSchemaName(), e);
-                } finally {
-                    ThreadLocalContextUtil.clear();
-                }
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        if (databaseStateVerifier.isLiquibaseDisabled() || !fineractProperties.getMode().isWriteEnabled()) {
+            LOG.warn("Liquibase is disabled. Not upgrading any database.");
+            if (!fineractProperties.getMode().isWriteEnabled()) {
+                LOG.warn("Liquibase is disabled because the current instance is configured as a non-write Fineract instance");
             }
+            return;
+        }
+        try {
+            // upgradeTenantStore();
+            upgradeIndividualTenants();
+        } catch (LiquibaseException e) {
+            throw new RuntimeException("Error while migrating the schema", e);
         }
     }
 
-    private void insertTenants() {
-        for(String tenant : tenants) {
-            TenantServerConnection existingTenant = repository.findOneBySchemaName(tenant);
-            if(existingTenant == null) {
-                TenantServerConnection tenantServerConnection = new TenantServerConnection();
-                tenantServerConnection.setSchemaName(tenant);
-                tenantServerConnection.setSchemaServer(hostname);
-                tenantServerConnection.setSchemaServerPort(String.valueOf(port));
-                tenantServerConnection.setSchemaUsername(username);
-                tenantServerConnection.setSchemaPassword(password);
-                tenantServerConnection.setAutoUpdateEnabled(true);
-                repository.saveAndFlush(tenantServerConnection);
-            }
+    private void upgradeTenantStore() throws LiquibaseException {
+        LOG.warn("Upgrading tenant store DB at {}:{}", fineractProperties.getTenant().getHost(), fineractProperties.getTenant().getPort());
+        logTenantStoreDetails();
+        if (databaseStateVerifier.isFirstLiquibaseMigration(tenantDataSource)) {
+            ExtendedSpringLiquibase liquibase = liquibaseFactory.create(tenantDataSource, TENANT_STORE_DB_CONTEXT, INITIAL_SWITCH_CONTEXT);
+            applyInitialLiquibase(tenantDataSource, liquibase, "tenant store",
+                    (ds) -> !databaseStateVerifier.isTenantStoreOnLatestUpgradableVersion(ds));
         }
+        SpringLiquibase liquibase = liquibaseFactory.create(tenantDataSource, TENANT_STORE_DB_CONTEXT);
+        liquibase.afterPropertiesSet();
+        LOG.warn("Tenant store upgrade finished");
     }
 
-    private void flywayDefaultSchema() {
-        final Flyway fw = new Flyway();
-        fw.setDataSource(dataSourcePerTenantService.retrieveDataSource());
-        fw.setLocations("sql/migrations/core");
-        fw.setInitOnMigrate(true);
-        fw.setOutOfOrder(true);
-        fw.migrate();
+    private void logTenantStoreDetails() {
+        LOG.info("- fineract.tenant.username: {}", fineractProperties.getTenant().getUsername());
+        LOG.info("- fineract.tenant.password: ****");
+        LOG.info("- fineract.tenant.parameters: {}", fineractProperties.getTenant().getParameters());
+        LOG.info("- fineract.tenant.timezone: {}", fineractProperties.getTenant().getTimezone());
+        LOG.info("- fineract.tenant.description: {}", fineractProperties.getTenant().getDescription());
+        LOG.info("- fineract.tenant.identifier: {}", fineractProperties.getTenant().getIdentifier());
+        LOG.info("- fineract.tenant.name: {}", fineractProperties.getTenant().getName());
+    }
+
+    private void upgradeIndividualTenants() throws LiquibaseException {
+        LOG.warn("Upgrading all tenants");
+        List<FineractPlatformTenant> tenants = tenantDetailsService.findAllTenants();
+        if (isNotEmpty(tenants)) {
+            for (FineractPlatformTenant tenant : tenants) {
+                upgradeIndividualTenant(tenant);
+            }
+        }
+        LOG.warn("Tenant upgrades have finished");
+    }
+
+    private void upgradeIndividualTenant(FineractPlatformTenant tenant) throws LiquibaseException {
+        LOG.info("Upgrade for tenant {} has started", tenant.getTenantIdentifier());
+        DataSource tenantDataSource = tenantDataSourceFactory.create(tenant);
+        if (databaseStateVerifier.isFirstLiquibaseMigration(tenantDataSource)) {
+            ExtendedSpringLiquibase liquibase = liquibaseFactory.create(tenantDataSource, TENANT_DB_CONTEXT, INITIAL_SWITCH_CONTEXT);
+            applyInitialLiquibase(tenantDataSource, liquibase, tenant.getTenantIdentifier(),
+                    (ds) -> !databaseStateVerifier.isTenantOnLatestUpgradableVersion(ds));
+        }
+        SpringLiquibase tenantLiquibase = liquibaseFactory.create(tenantDataSource, TENANT_DB_CONTEXT);
+        tenantLiquibase.afterPropertiesSet();
+        LOG.info("Upgrade for tenant {} has finished", tenant.getTenantIdentifier());
+    }
+
+    private void applyInitialLiquibase(DataSource dataSource, ExtendedSpringLiquibase liquibase, String id,
+            Function<DataSource, Boolean> isUpgradableFn) throws LiquibaseException {
+        if (databaseStateVerifier.isFlywayPresent(dataSource)) {
+            /*
+            if (isUpgradableFn.apply(dataSource)) {
+                LOG.warn("Cannot proceed with upgrading database {}", id);
+                LOG.warn("It seems the database doesn't have the latest schema changes applied until the 1.6 release");
+                throw new SchemaUpgradeNeededException("Make sure to upgrade to Fineract 1.6 first and then to a newer version");
+            }*/
+            LOG.warn("This is the first Liquibase migration for {}. We'll sync the changelog for you and then apply everything else", id);
+            liquibase.changeLogSync();
+            LOG.warn("Liquibase changelog sync is complete");
+        } else {
+            liquibase.afterPropertiesSet();
+        }
     }
 }

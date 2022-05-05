@@ -36,7 +36,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "m_role")
-public class Role extends AbstractPersistableCustom<Long> {
+public class Role extends AbstractPersistableCustom {
 
     @Column(name = "name", unique = true, nullable = false, length = 100)
     private String name;

@@ -4,13 +4,12 @@ import org.eclipse.persistence.annotations.Index;
 import org.apache.fineract.organisation.parent.AbstractPersistableCustom;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
-@Table(name = "batches")
-public class Batch extends AbstractPersistableCustom<Long> {
+@Table(name = "ph_batches")
+public class Batch extends AbstractPersistableCustom {
 
     @Column(name = "BATCH_ID")
     private String batchId;

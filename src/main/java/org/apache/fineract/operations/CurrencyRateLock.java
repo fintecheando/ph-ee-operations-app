@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "m_currency_rates_lock")
-public class CurrencyRateLock  extends AbstractPersistableCustom<Long> {
+public class CurrencyRateLock  extends AbstractPersistableCustom {
 
     @Column(name = "unique_key")
     private String uniqueKey;

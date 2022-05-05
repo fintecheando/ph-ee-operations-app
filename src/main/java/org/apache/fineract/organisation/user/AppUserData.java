@@ -22,10 +22,14 @@ import org.apache.fineract.organisation.office.OfficeData;
 import org.apache.fineract.organisation.role.RoleData;
 import org.apache.fineract.organisation.staff.StaffData;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Collection;
 import java.util.Objects;
 
-
+@Getter
+@Setter
 public class AppUserData {
 
     private Long id;
@@ -55,102 +59,6 @@ public class AppUserData {
         this.allowedOffices = allowedOffices;
         this.availableRoles = availableRoles;
         this.selectedRoles = selectedRoles;
-        this.staff = staff;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public Long getOfficeId() {
-        return officeId;
-    }
-
-    public void setOfficeId(Long officeId) {
-        this.officeId = officeId;
-    }
-
-    public String getOfficeName() {
-        return officeName;
-    }
-
-    public void setOfficeName(String officeName) {
-        this.officeName = officeName;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Boolean getPasswordNeverExpires() {
-        return passwordNeverExpires;
-    }
-
-    public void setPasswordNeverExpires(Boolean passwordNeverExpires) {
-        this.passwordNeverExpires = passwordNeverExpires;
-    }
-
-    public Collection<OfficeData> getAllowedOffices() {
-        return allowedOffices;
-    }
-
-    public void setAllowedOffices(Collection<OfficeData> allowedOffices) {
-        this.allowedOffices = allowedOffices;
-    }
-
-    public Collection<RoleData> getAvailableRoles() {
-        return availableRoles;
-    }
-
-    public void setAvailableRoles(Collection<RoleData> availableRoles) {
-        this.availableRoles = availableRoles;
-    }
-
-    public Collection<RoleData> getSelectedRoles() {
-        return selectedRoles;
-    }
-
-    public void setSelectedRoles(Collection<RoleData> selectedRoles) {
-        this.selectedRoles = selectedRoles;
-    }
-
-    public StaffData getStaff() {
-        return staff;
-    }
-
-    public void setStaff(StaffData staff) {
         this.staff = staff;
     }
 

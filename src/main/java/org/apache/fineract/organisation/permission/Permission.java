@@ -33,7 +33,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "m_permission")
-public class Permission extends AbstractPersistableCustom<Long> {
+public class Permission extends AbstractPersistableCustom {
 
     @Column(name = "grouping", nullable = false, length = 45)
     private String grouping;

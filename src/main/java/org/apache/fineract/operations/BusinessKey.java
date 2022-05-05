@@ -4,13 +4,18 @@ package org.apache.fineract.operations;
 import org.apache.fineract.organisation.parent.AbstractPersistableCustom;
 import org.eclipse.persistence.annotations.Index;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+@Getter
+@Setter
 @Entity
-@Table(name = "businesskeys")
-public class BusinessKey extends AbstractPersistableCustom<Long> {
+@Table(name = "ph_businesskeys")
+public class BusinessKey extends AbstractPersistableCustom {
 
     @Column(name = "BUSINESS_KEY")
     @Index(name = "idx_businessKey")
@@ -26,36 +31,4 @@ public class BusinessKey extends AbstractPersistableCustom<Long> {
 
     @Column(name = "TIMESTAMP")
     private Long timestamp;
-
-    public String getBusinessKeyType() {
-        return businessKeyType;
-    }
-
-    public void setBusinessKeyType(String businessKeyType) {
-        this.businessKeyType = businessKeyType;
-    }
-
-    public Long getWorkflowInstanceKey() {
-        return workflowInstanceKey;
-    }
-
-    public void setWorkflowInstanceKey(Long workflowInstanceKey) {
-        this.workflowInstanceKey = workflowInstanceKey;
-    }
-
-    public Long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getBusinessKey() {
-        return businessKey;
-    }
-
-    public void setBusinessKey(String transactionId) {
-        this.businessKey = transactionId;
-    }
 }

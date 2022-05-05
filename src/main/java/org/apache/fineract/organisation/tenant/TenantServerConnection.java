@@ -27,7 +27,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "tenant_server_connections")
-public class TenantServerConnection extends AbstractPersistableCustom<Long> {
+public class TenantServerConnection extends AbstractPersistableCustom {
 
     @Column(name = "schema_server")
     private String schemaServer;

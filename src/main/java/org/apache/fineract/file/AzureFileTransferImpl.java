@@ -16,7 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 @Service
-@Qualifier("azureStorage")
+@Qualifier("cloudStorageAzure")
 @ConditionalOnProperty(
         value="cloud.azure.enabled",
         havingValue = "true")

@@ -26,7 +26,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "m_group_level")
-public class GroupLevel extends AbstractPersistableCustom<Long> {
+public class GroupLevel extends AbstractPersistableCustom {
 
     @Column(name = "parent_id")
     private Long parentId;

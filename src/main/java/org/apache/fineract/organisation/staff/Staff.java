@@ -36,7 +36,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "m_staff")
-public class Staff extends AbstractPersistableCustom<Long> {
+public class Staff extends AbstractPersistableCustom {
 
     @Column(name = "firstname", length = 50)
     private String firstname;

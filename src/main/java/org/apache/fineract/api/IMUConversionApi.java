@@ -93,7 +93,7 @@ public class IMUConversionApi {
             }
             currencyRates.add(exchange);
         }
-        currencyRateRepository.save(currencyRates);
+        currencyRateRepository.saveAll(currencyRates);
     }
 
     @DeleteMapping(path = "/imuexchange/master", consumes = MediaType.APPLICATION_JSON_VALUE)
