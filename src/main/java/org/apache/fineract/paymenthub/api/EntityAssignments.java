@@ -1,4 +1,4 @@
-package org.apache.fineract.api;
+package org.apache.fineract.paymenthub.api;
 
 import java.util.List;
 

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.api;
+package org.apache.fineract.paymenthub.api;
 
 import org.apache.fineract.organisation.permission.Permission;
 import org.apache.fineract.organisation.permission.PermissionRepository;

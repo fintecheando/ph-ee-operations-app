@@ -1,4 +1,4 @@
-package org.apache.fineract.file.config;
+package org.apache.fineract.paymenthub.file.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;

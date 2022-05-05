@@ -1,4 +1,4 @@
-package org.apache.fineract.file;
+package org.apache.fineract.paymenthub.file;
 
 import com.azure.storage.blob.BlobClientBuilder;
 import com.azure.storage.blob.models.BlobProperties;

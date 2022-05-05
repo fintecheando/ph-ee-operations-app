@@ -1,6 +1,6 @@
-package org.apache.fineract.exception;
+package org.apache.fineract.paymenthub.exception;
 
-import org.apache.fineract.data.ErrorCode;
+import org.apache.fineract.paymenthub.data.ErrorCode;
 
 public class WriteToCsvException extends Exception {
 

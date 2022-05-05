@@ -1,4 +1,4 @@
-package org.apache.fineract.file;
+package org.apache.fineract.paymenthub.file;
 
 import org.springframework.stereotype.Service;
 

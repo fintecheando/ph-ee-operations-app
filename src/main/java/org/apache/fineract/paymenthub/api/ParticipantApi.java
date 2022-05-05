@@ -1,4 +1,4 @@
-package org.apache.fineract.api;
+package org.apache.fineract.paymenthub.api;
 
 import java.util.List;
 
@@ -14,11 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 public class ParticipantApi {
 
+    private final static String API_PATH = "/dfsp";
 
     @Autowired
     private ParticipantRepository participantRepository;
 
-    @GetMapping("/dfsp")
+    @GetMapping(API_PATH)
     public List<Participant> participants() {
         return this.participantRepository.findAll();
     }

@@ -1,4 +1,4 @@
-package org.apache.fineract.data;
+package org.apache.fineract.paymenthub.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

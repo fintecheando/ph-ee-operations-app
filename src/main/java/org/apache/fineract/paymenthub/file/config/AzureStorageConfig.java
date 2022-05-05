@@ -1,4 +1,4 @@
-package org.apache.fineract.file.config;
+package org.apache.fineract.paymenthub.file.config;
 
 import com.azure.storage.blob.BlobClientBuilder;
 import org.springframework.beans.factory.annotation.Value;

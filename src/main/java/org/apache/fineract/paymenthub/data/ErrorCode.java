@@ -1,4 +1,4 @@
-package org.apache.fineract.data;
+package org.apache.fineract.paymenthub.data;
 
 public enum ErrorCode {
     CSV_GET_WRITER,

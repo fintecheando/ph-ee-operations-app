@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.api;
+package org.apache.fineract.paymenthub.api;
 
 import org.apache.fineract.organisation.role.Role;
 import org.apache.fineract.organisation.role.RoleRepository;
@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
-import static org.apache.fineract.api.AssignmentAction.ASSIGN;
+import static org.apache.fineract.paymenthub.api.AssignmentAction.ASSIGN;
 
 @RestController
 @RequestMapping("/api/v1")

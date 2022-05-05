@@ -1,10 +1,10 @@
-package org.apache.fineract.api;
+package org.apache.fineract.paymenthub.api;
 
-import org.apache.fineract.data.IMUConversionData;
 import org.apache.fineract.operations.CurrencyRate;
 import org.apache.fineract.operations.CurrencyRateLock;
 import org.apache.fineract.operations.CurrencyRateLockRepository;
 import org.apache.fineract.operations.CurrencyRateRepository;
+import org.apache.fineract.paymenthub.data.IMUConversionData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

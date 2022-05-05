@@ -1,4 +1,4 @@
-package org.apache.fineract.api;
+package org.apache.fineract.paymenthub.api;
 
 import org.apache.fineract.operations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1")
 public class BatchApi {
+
+    private final static String API_PATH = "/batch";
+
     @Autowired
     private TransferRepository transferRepository;
 
@@ -35,7 +38,7 @@ public class BatchApi {
     private String bucketName;
 
 
-    @GetMapping("/batch")
+    @GetMapping(API_PATH)
     public BatchDTO batchDetails(@RequestParam(value = "batchId", required = false) String batchId,
                                  @RequestParam(value = "requestId", required = false) String requestId) {
         Batch batch = batchRepository.findByBatchId(batchId);
@@ -56,7 +59,7 @@ public class BatchApi {
 
     }
 
-    @GetMapping("/batch/detail")
+    @GetMapping(API_PATH + "/detail")
     public ResponseEntity<List<Transfer>> batchDetails(@RequestParam(value = "batchId") String batchId,
                                                        @RequestParam(value = "status", defaultValue = "ALL") String status,
                                                        @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
@@ -75,7 +78,7 @@ public class BatchApi {
         return new ResponseEntity<List<Transfer>>(transfers, new HttpHeaders(), HttpStatus.OK);
     }
 
-    @GetMapping("/batch/transactions")
+    @GetMapping(API_PATH + "/transactions")
     public HashMap<String, String> batchTransactionDetails(@RequestParam String batchId) {
         Batch batch = batchRepository.findByBatchId(batchId);
         if (batch != null) {

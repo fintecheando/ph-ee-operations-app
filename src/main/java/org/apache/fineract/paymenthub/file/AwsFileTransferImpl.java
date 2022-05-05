@@ -1,4 +1,4 @@
-package org.apache.fineract.file;
+package org.apache.fineract.paymenthub.file;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;

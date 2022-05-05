@@ -1,8 +1,8 @@
 package org.apache.fineract.utils;
 
-import org.apache.fineract.data.ErrorCode;
-import org.apache.fineract.exception.CsvWriterException;
-import org.apache.fineract.exception.WriteToCsvException;
+import org.apache.fineract.paymenthub.data.ErrorCode;
+import org.apache.fineract.paymenthub.exception.CsvWriterException;
+import org.apache.fineract.paymenthub.exception.WriteToCsvException;
 import org.supercsv.io.CsvBeanWriter;
 import org.supercsv.io.ICsvBeanWriter;
 import org.supercsv.prefs.CsvPreference;

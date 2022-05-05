@@ -1,4 +1,4 @@
-package org.apache.fineract.api;
+package org.apache.fineract.paymenthub.api;
 
 public enum AssignmentAction {
     ASSIGN, REVOKE
