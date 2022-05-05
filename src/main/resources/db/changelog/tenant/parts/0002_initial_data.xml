@@ -81,18 +81,15 @@
             <column name="RECOVERABLE" valueBoolean="true"/>
         </insert>
     </changeSet>
-    <changeSet author="fineract" id="ph_0002_4">
+    <changeSet author="fineract" id="ph_0002_5">
         <insert tableName="ph_participants">
-            <column name="id" value="1"/>
-            <column name="name" value="Buffalo Bank"/>
+            <column name="participant" value="Buffalo Bank"/>
         </insert>
         <insert tableName="ph_participants">
-            <column name="id" value="2"/>
-            <column name="name" value="Lion Bank"/>
+            <column name="participant" value="Lion Bank"/>
         </insert>
         <insert tableName="ph_participants">
-            <column name="id" value="3"/>
-            <column name="name" value="Leopard Bank"/>
+            <column name="participant" value="Leopard Bank"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

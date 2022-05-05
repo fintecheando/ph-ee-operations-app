@@ -16,6 +16,6 @@ import lombok.Setter;
 @Table(name = "ph_participants")
 public class Participant extends AbstractPersistableCustom {
 
-    @Column(name = "DFSP_NAME")
+    @Column(name = "participant")
     private String dfspName;
 }

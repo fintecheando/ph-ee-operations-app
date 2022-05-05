@@ -4,7 +4,6 @@ import org.apache.fineract.operations.ErrorCode;
 import org.apache.fineract.operations.ErrorCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,32 +12,35 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Controller
-@RequestMapping(value="/api/v1/errorcode", produces=MediaType.APPLICATION_JSON_VALUE)
+@RestController
+@RequestMapping(value="/api/v1", produces=MediaType.APPLICATION_JSON_VALUE)
 public class ErrorCodesApi {
+
+    private final static String API_PATH = "/errorcode";
 
     @Autowired
     private ErrorCodeRepository errorCodesRepository;
 
-    @PostMapping("/")
+    @PostMapping(API_PATH)
     public ErrorCode addErrorCode(@RequestBody ErrorCode errorCode) {
         ErrorCode response = errorCodesRepository.save(errorCode);
         return response;
     }
 
-    @RequestMapping(value="/", method=RequestMethod.GET)
+    @GetMapping(API_PATH)
     public List<ErrorCode> getAllErrorCode() {
         List<ErrorCode> errorCodes = new ArrayList<>();
         errorCodesRepository.findAll().forEach(errorCodes::add);
         return errorCodes;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping(API_PATH + "/{id}")
     public ErrorCode getSpecificErrorCode(@PathVariable Long id) {
         Optional<ErrorCode> optEntity = errorCodesRepository.findById(id);
         if (optEntity.isPresent()) {
@@ -47,7 +49,7 @@ public class ErrorCodesApi {
         return null;
     }
 
-    @GetMapping("/filter")
+    @GetMapping(API_PATH + "/filter")
     public List<ErrorCode> getErrorCodeByFilter(@RequestParam("by") String filterType, @RequestParam("value") Object value) {
         switch (filterType){
             case "errorCode":
@@ -62,14 +64,14 @@ public class ErrorCodesApi {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(API_PATH + "/{id}")
     public ErrorCode updateErrorCode(@PathVariable Long id, @RequestBody ErrorCode errorCode) {
         errorCode.setId(id);
         ErrorCode response = errorCodesRepository.save(errorCode);
         return response;
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping(API_PATH + "/{id}")
     public ErrorCode deleteErrorCode(@PathVariable Long id) {
         ErrorCode errorCode = getSpecificErrorCode(id);
         errorCodesRepository.delete(errorCode);
