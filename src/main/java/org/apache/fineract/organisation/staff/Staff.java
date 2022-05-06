@@ -18,11 +18,9 @@
  */
 package org.apache.fineract.organisation.staff;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.organisation.parent.AbstractPersistableCustom;
 import org.apache.fineract.organisation.document.Image;
 import org.apache.fineract.organisation.office.Office;
-import org.joda.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,6 +30,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
 import java.util.Date;
 
 @Entity
@@ -85,21 +84,6 @@ public class Staff extends AbstractPersistableCustom {
         //
     }
 
-    private Staff(final Office staffOffice, final String firstname, final String lastname, final String externalId, final String mobileNo,
-            final boolean isLoanOfficer, final Boolean isActive, final LocalDate joiningDate) {
-        this.office = staffOffice;
-        this.firstname = StringUtils.defaultIfEmpty(firstname, null);
-        this.lastname = StringUtils.defaultIfEmpty(lastname, null);
-        this.externalId = StringUtils.defaultIfEmpty(externalId, null);
-        this.mobileNo = StringUtils.defaultIfEmpty(mobileNo, null);
-        this.loanOfficer = isLoanOfficer;
-        this.active = (isActive == null) ? true : isActive;
-        deriveDisplayName(firstname);
-        if (joiningDate != null) {
-            this.joiningDate = joiningDate.toDateTimeAtStartOfDay().toDate();
-        }
-    }
-
     public EnumOptionData organisationalRoleData() {
         EnumOptionData organisationalRole = null;
         if (this.organisationalRoleType != null) {
@@ -127,14 +111,6 @@ public class Staff extends AbstractPersistableCustom {
 
     public boolean isActive() {
         return this.active;
-    }
-
-    private void deriveDisplayName(final String firstname) {
-        if (!StringUtils.isBlank(firstname)) {
-            this.displayName = this.lastname + ", " + this.firstname;
-        } else {
-            this.displayName = this.lastname;
-        }
     }
 
     public boolean identifiedBy(final Staff staff) {

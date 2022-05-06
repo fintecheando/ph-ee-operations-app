@@ -44,7 +44,6 @@ dependencies {
         'org.json:json:20190722',
         'org.eclipse.persistence:org.eclipse.persistence.jpa:2.7.10',
         'org.hibernate:hibernate-jpamodelgen:5.4.17.Final',
-        'joda-time:joda-time:2.10.6',
         'org.apache.commons:commons-lang3:3.3.2',
         'com.zaxxer:HikariCP:3.4.5',
         'mysql:mysql-connector-java:8.0.28',
@@ -66,7 +65,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-    annotationProcessor 'org.hibernate:hibernate-jpamodelgen:5.4.17.Final'
+    annotationProcessor('org.hibernate:hibernate-jpamodelgen:5.4.17.Final')
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'junit:junit:4.11'
@@ -75,10 +74,15 @@ dependencies {
 group = 'org.apache.fineract'
 version = '1.0.0-SNAPSHOT'
 
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.annotationProcessorGeneratedSourcesDirectory = file("src/main/java")
+}
+
 sourceSets {
     generated {
         java {
-            srcDirs = ['src/generated/java']
+            srcDirs = ['src/main/java']
         }
     }
 }
@@ -89,11 +93,6 @@ publishing {
             from(components.java)
         }
     }
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-    options.annotationProcessorGeneratedSourcesDirectory = file("src/generated/java")
 }
 
 springBoot {

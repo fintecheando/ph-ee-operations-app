@@ -11,3 +11,6 @@ bin
 src/generated
 .DS_Store
 .vscode
+**/*_.java
+libs/
+env
