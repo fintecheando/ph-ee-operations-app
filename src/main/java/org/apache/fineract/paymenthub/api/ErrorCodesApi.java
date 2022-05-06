@@ -2,8 +2,6 @@ package org.apache.fineract.paymenthub.api;
 
 import org.apache.fineract.paymenthub.domain.ErrorCode;
 import org.apache.fineract.paymenthub.domain.ErrorCodeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,34 +12,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+
 @RestController
-@RequestMapping(value="/api/v1", produces=MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value=OperationsConstants.API_VERSION_PATH, produces=MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
 public class ErrorCodesApi {
 
-    private final static String API_PATH = "/errorcode";
+    private final ErrorCodeRepository errorCodesRepository;
 
-    @Autowired
-    private ErrorCodeRepository errorCodesRepository;
-
-    @PostMapping(API_PATH)
-    public ErrorCode addErrorCode(@RequestBody ErrorCode errorCode) {
-        ErrorCode response = errorCodesRepository.save(errorCode);
-        return response;
+    @PostMapping(value = OperationsConstants.API_ERRORCODE_PATH, consumes = MediaType.APPLICATION_JSON)
+    public ErrorCode create(@RequestBody ErrorCode errorCode) {
+        return errorCodesRepository.save(errorCode);
     }
 
-    @GetMapping(API_PATH)
-    public List<ErrorCode> getAllErrorCode() {
+    @GetMapping(value = OperationsConstants.API_ERRORCODE_PATH)
+    public List<ErrorCode> errorCodes() {
         List<ErrorCode> errorCodes = new ArrayList<>();
         errorCodesRepository.findAll().forEach(errorCodes::add);
         return errorCodes;
     }
 
-    @GetMapping(API_PATH + "/{id}")
-    public ErrorCode getSpecificErrorCode(@PathVariable Long id) {
+    @GetMapping(value = OperationsConstants.API_ERRORCODE_PATH + "/{id}", consumes = MediaType.APPLICATION_JSON)
+    public ErrorCode errorCode(@PathVariable Long id) {
         Optional<ErrorCode> optEntity = errorCodesRepository.findById(id);
         if (optEntity.isPresent()) {
             return optEntity.get();
@@ -49,8 +49,8 @@ public class ErrorCodesApi {
         return null;
     }
 
-    @GetMapping(API_PATH + "/filter")
-    public List<ErrorCode> getErrorCodeByFilter(@RequestParam("by") String filterType, @RequestParam("value") Object value) {
+    @GetMapping(OperationsConstants.API_ERRORCODE_PATH + "/filter")
+    public List<ErrorCode> errorCodeByFilter(@RequestParam("by") String filterType, @RequestParam("value") Object value) {
         switch (filterType){
             case "errorCode":
                 return errorCodesRepository.getErrorCodesByErrorCode(value.toString());
@@ -64,17 +64,24 @@ public class ErrorCodesApi {
         }
     }
 
-    @PutMapping(API_PATH + "/{id}")
-    public ErrorCode updateErrorCode(@PathVariable Long id, @RequestBody ErrorCode errorCode) {
-        errorCode.setId(id);
-        ErrorCode response = errorCodesRepository.save(errorCode);
-        return response;
+    @PutMapping(value =OperationsConstants.API_ERRORCODE_PATH + "/{id}", consumes = MediaType.APPLICATION_JSON)
+    public void update(@PathVariable Long id, @RequestBody ErrorCode errorCode, HttpServletResponse response) {
+        Optional<ErrorCode> optEntity = errorCodesRepository.findById(id);
+        if (optEntity.isPresent()) {
+            errorCode.setId(id);
+            errorCodesRepository.save(errorCode);
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 
-    @DeleteMapping(API_PATH + "/{id}")
-    public ErrorCode deleteErrorCode(@PathVariable Long id) {
-        ErrorCode errorCode = getSpecificErrorCode(id);
-        errorCodesRepository.delete(errorCode);
-        return errorCode;
+    @DeleteMapping(OperationsConstants.API_ERRORCODE_PATH + "/{id}")
+    public void delete(@PathVariable Long id, HttpServletResponse response) {
+        Optional<ErrorCode> optEntity = errorCodesRepository.findById(id);
+        if (optEntity.isPresent()) {
+            errorCodesRepository.delete(optEntity.get());
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
 }

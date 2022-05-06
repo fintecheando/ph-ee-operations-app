@@ -18,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,31 +33,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import lombok.RequiredArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value=OperationsConstants.API_VERSION_PATH, produces=MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
 public class OperationsApi {
-    private final static String API_PATH = "/transfer";
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired
-    private BusinessKeyRepository businessKeyRepository;
-
-    @Autowired
-    private TaskRepository taskRepository;
-
-    @Autowired
-    private VariableRepository variableRepository;
-
-    @Autowired
-    private TransferRepository transferRepository;
-
-    @Autowired
-    private TransactionRequestRepository transactionRequestRepository;
+    private final BusinessKeyRepository businessKeyRepository;
+    private final TaskRepository taskRepository;
+    private final VariableRepository variableRepository;
+    private final TransferRepository transferRepository;
+    private final TransactionRequestRepository transactionRequestRepository;
 
     // @Autowired
     private RestTemplate restTemplate;
@@ -69,7 +63,7 @@ public class OperationsApi {
     @Value("${channel-connector.transfer-path}")
     private String channelConnectorTransferPath;
 
-    @PostMapping(API_PATH + "/{transactionId}/refund")
+    @PostMapping(OperationsConstants.API_TRANSFERS_PATH + "/{transactionId}/refund")
     public String refundTransfer(@RequestHeader("Platform-TenantId") String tenantId,
                                  @PathVariable("transactionId") String transactionId,
                                  @RequestBody String requestBody,
@@ -133,7 +127,7 @@ public class OperationsApi {
         extensionList.put(extension);
     }
 
-    @GetMapping(API_PATH + "/{workflowInstanceKey}")
+    @GetMapping(OperationsConstants.API_TRANSFERS_PATH + "/{workflowInstanceKey}")
     public TransferDetail transferDetails(@PathVariable Long workflowInstanceKey) {
         Transfer transfer = transferRepository.findFirstByWorkflowInstanceKey(workflowInstanceKey);
         List<Task> tasks = taskRepository.findByWorkflowInstanceKeyOrderByTimestamp(workflowInstanceKey);
@@ -141,7 +135,7 @@ public class OperationsApi {
         return new TransferDetail(transfer, tasks, variables);
     }
 
-    @GetMapping("/transactionRequest/{workflowInstanceKey}")
+    @GetMapping(OperationsConstants.API_TRANSACTION_PATH + "/{workflowInstanceKey}")
     public TransactionRequestDetail transactionRequestDetails(@PathVariable Long workflowInstanceKey) {
         TransactionRequest transactionRequest = transactionRequestRepository.findFirstByWorkflowInstanceKey(workflowInstanceKey);
         List<Task> tasks = taskRepository.findByWorkflowInstanceKeyOrderByTimestamp(workflowInstanceKey);
@@ -149,7 +143,7 @@ public class OperationsApi {
         return new TransactionRequestDetail(transactionRequest, tasks, variables);
     }
 
-    @GetMapping("/variables")
+    @GetMapping(OperationsConstants.API_VARIABLES_PATH)
     public List<List<Variable>> variables(
             @RequestParam(value = "businessKey") String businessKey,
             @RequestParam(value = "businessKeyType") String businessKeyType
@@ -159,7 +153,7 @@ public class OperationsApi {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/tasks")
+    @GetMapping(OperationsConstants.API_TASKS_PATH)
     public List<List<Task>> tasks(
             @RequestParam(value = "businessKey") String businessKey,
             @RequestParam(value = "businessKeyType") String businessKeyType
@@ -175,5 +169,4 @@ public class OperationsApi {
         logger.debug("loaded {} transfer(s) for business key {} of type {}", businessKeys.size(), businessKey, businessKeyType);
         return businessKeys;
     }
-
 }

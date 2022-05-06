@@ -23,8 +23,7 @@ import org.apache.fineract.organisation.permission.Permission;
 import org.apache.fineract.organisation.permission.PermissionRepository;
 import org.apache.fineract.organisation.role.Role;
 import org.apache.fineract.organisation.role.RoleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +34,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -44,21 +47,20 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.fineract.paymenthub.api.AssignmentAction.ASSIGN;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value=OperationsConstants.API_VERSION_PATH, produces=MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
+@Profile(OperationsConstants.API_STANDALONE_LOCAL)
 public class RolesApi {
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
 
-    @Autowired
-    private PermissionRepository permissionRepository;
-
-    @GetMapping(path = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = OperationsConstants.API_ROLES_PATH, produces = MediaType.APPLICATION_JSON)
     public List<Role> retrieveAll() {
         return this.roleRepository.findAll();
     }
 
-    @GetMapping(path = "/role/{roleId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = OperationsConstants.API_ROLES_PATH + "/{roleId}", produces = MediaType.APPLICATION_JSON)
     public Role retrieveOne(@PathVariable("roleId") Long roleId, HttpServletResponse response) {
         Optional<Role> optEntity = roleRepository.findById(roleId);
         if(optEntity.isPresent()) {
@@ -69,7 +71,7 @@ public class RolesApi {
         }
     }
 
-    @GetMapping(path = "/role/{roleId}/permissions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = OperationsConstants.API_ROLES_PATH + "/{roleId}/permissions", produces = MediaType.APPLICATION_JSON)
     public Collection<Permission> retrievePermissions(@PathVariable("roleId") Long roleId, HttpServletResponse response) {
         Optional<Role> optEntity = roleRepository.findById(roleId);
         if(optEntity.isPresent()) {
@@ -80,7 +82,7 @@ public class RolesApi {
         }
     }
 
-    @PostMapping(path = "/role", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = OperationsConstants.API_ROLES_PATH, consumes = MediaType.APPLICATION_JSON)
     public void create(@RequestBody Role role, HttpServletResponse response) {
         Role existing = roleRepository.getRoleByName(role.getName());
         if (existing == null) {
@@ -91,7 +93,7 @@ public class RolesApi {
         }
     }
 
-    @PutMapping(path = "/role/{roleId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = OperationsConstants.API_ROLES_PATH + "/{roleId}", consumes = MediaType.APPLICATION_JSON)
     public void update(@PathVariable("roleId") Long roleId, @RequestBody Role role, HttpServletResponse response) {
         Optional<Role> optEntity = roleRepository.findById(roleId);
         if(optEntity.isPresent()) {
@@ -105,7 +107,7 @@ public class RolesApi {
         }
     }
 
-    @DeleteMapping(path = "/role/{roleId}")
+    @DeleteMapping(path = OperationsConstants.API_ROLES_PATH + "/{roleId}")
     public void delete(@PathVariable("roleId") Long roleId, HttpServletResponse response) {
         Optional<Role> optEntity = roleRepository.findById(roleId);
         if(optEntity.isPresent()) {
@@ -115,7 +117,7 @@ public class RolesApi {
         }
     }
 
-    @PutMapping(path = "/role/{roleId}/permissions", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = OperationsConstants.API_ROLES_PATH + "/{roleId}/permissions", consumes = MediaType.APPLICATION_JSON)
     public void permissionAssignment(@PathVariable("roleId") Long roleId, @RequestParam("action") AssignmentAction action,
                                      @RequestBody EntityAssignments assignments, HttpServletResponse response) {
         Optional<Role> optEntity = roleRepository.findById(roleId);

@@ -20,8 +20,7 @@ package org.apache.fineract.paymenthub.api;
 
 import org.apache.fineract.organisation.permission.Permission;
 import org.apache.fineract.organisation.permission.PermissionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,24 +30,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+
 import java.util.List;
 import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value=OperationsConstants.API_VERSION_PATH, produces=MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
+@Profile(OperationsConstants.API_STANDALONE_LOCAL)
 public class PermissionsApi {
 
-    @Autowired
-    private PermissionRepository permissionRepository;
+    private final PermissionRepository permissionRepository;
 
-    @GetMapping(path = "/permissions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = OperationsConstants.API_PERMISSIONS_PATH, produces = MediaType.APPLICATION_JSON)
     public List<Permission> retrieveAll() {
         return this.permissionRepository.findAll();
     }
 
-    @GetMapping(path = "/permission/{permissionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = OperationsConstants.API_PERMISSIONS_PATH + "/{permissionId}", produces = MediaType.APPLICATION_JSON)
     public Permission retrieveOne(@PathVariable("permissionId") Long permissionId, HttpServletResponse response) {        
         Optional<Permission> optEntity = permissionRepository.findById(permissionId);
         if (optEntity.isPresent()) {
@@ -58,7 +62,7 @@ public class PermissionsApi {
         return null;
     }
 
-    @PostMapping(path = "/permission", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = OperationsConstants.API_PERMISSIONS_PATH, consumes = MediaType.APPLICATION_JSON)
     public void create(@RequestBody Permission permission, HttpServletResponse response) {
         Permission existing = permissionRepository.findOneByCode(permission.getCode());
         if (existing == null) {
@@ -69,7 +73,7 @@ public class PermissionsApi {
         }
     }
 
-    @PutMapping(path = "/permission/{permissionId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = OperationsConstants.API_PERMISSIONS_PATH + "/{permissionId}", consumes = MediaType.APPLICATION_JSON)
     public void update(@PathVariable("permissionId") Long permissionId, @RequestBody Permission permission, HttpServletResponse response) {
         Optional<Permission> optEntity = permissionRepository.findById(permissionId);
         if (optEntity.isPresent()) {
@@ -82,7 +86,7 @@ public class PermissionsApi {
         }
     }
 
-    @DeleteMapping(path = "/permission/{permissionId}")
+    @DeleteMapping(path = OperationsConstants.API_PERMISSIONS_PATH + "/{permissionId}")
     public void delete(@PathVariable("permissionId") Long permissionId, HttpServletResponse response) {
         Optional<Permission> optEntity = permissionRepository.findById(permissionId);
         if (optEntity.isPresent()) {

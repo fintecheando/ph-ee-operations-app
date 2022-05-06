@@ -16,13 +16,17 @@ import org.apache.fineract.paymenthub.domain.Transfer_;
 import org.apache.fineract.utils.CsvUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
+
+import lombok.RequiredArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
@@ -35,36 +39,34 @@ import static org.apache.fineract.core.service.OperatorUtils.dateFormat;
 
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value=OperationsConstants.API_VERSION_PATH, produces=MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
 public class OperationsDetailedApi {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    
+    private final TransferRepository transferRepository;
+    private final TransactionRequestRepository transactionRequestRepository;
 
-    @Autowired
-    private TransferRepository transferRepository;
-
-    @Autowired
-    private TransactionRequestRepository transactionRequestRepository;
-
-    @GetMapping("/transfers")
+    @GetMapping(OperationsConstants.API_TRANSFERS_PATH)
     public Page<Transfer> transfers(
-            @RequestParam(value = "page") Integer page,
-            @RequestParam(value = "size") Integer size,
-            @RequestParam(value = "payerPartyId", required = false) String payerPartyId,
-            @RequestParam(value = "payerDfspId", required = false) String payerDfspId,
-            @RequestParam(value = "payeePartyId", required = false) String payeePartyId,
-            @RequestParam(value = "payeeDfspId", required = false) String payeeDfspId,
-            @RequestParam(value = "transactionId", required = false) String transactionId,
-            @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "amount", required = false) BigDecimal amount,
-            @RequestParam(value = "currency", required = false) String currency,
-            @RequestParam(value = "startFrom", required = false) String startFrom,
-            @RequestParam(value = "startTo", required = false) String startTo,
-            @RequestParam(value = "direction", required = false) String direction,
-            @RequestParam(value = "sortedBy", required = false) String sortedBy,
-            @RequestParam(value = "partyId", required = false) String partyId,
-            @RequestParam(value = "partyIdType", required = false) String partyIdType,
-            @RequestParam(value = "sortedOrder", required = false, defaultValue = "DESC") String sortedOrder) {
+        @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+        @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
+        @RequestParam(value = "payerPartyId", required = false) String payerPartyId,
+        @RequestParam(value = "payerDfspId", required = false) String payerDfspId,
+        @RequestParam(value = "payeePartyId", required = false) String payeePartyId,
+        @RequestParam(value = "payeeDfspId", required = false) String payeeDfspId,
+        @RequestParam(value = "transactionId", required = false) String transactionId,
+        @RequestParam(value = "status", required = false) String status,
+        @RequestParam(value = "amount", required = false) BigDecimal amount,
+        @RequestParam(value = "currency", required = false) String currency,
+        @RequestParam(value = "startFrom", required = false) String startFrom,
+        @RequestParam(value = "startTo", required = false) String startTo,
+        @RequestParam(value = "direction", required = false) String direction,
+        @RequestParam(value = "sortedBy", required = false) String sortedBy,
+        @RequestParam(value = "partyId", required = false) String partyId,
+        @RequestParam(value = "partyIdType", required = false) String partyIdType,
+        @RequestParam(value = "sortedOrder", required = false, defaultValue = "DESC") String sortedOrder) {
         List<Specification<Transfer>> specs = new ArrayList<>();
 
         if (payerPartyId != null) {
@@ -155,7 +157,7 @@ public class OperationsDetailedApi {
         }
     }
 
-    @GetMapping("/transactionRequests")
+    @GetMapping(OperationsConstants.API_TRANSACTION_PATH)
     public Page<TransactionRequest> transactionRequests(
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
@@ -240,7 +242,7 @@ public class OperationsDetailedApi {
      * @param filterBy type of filter we want to apply, @see [Filter]
      * @param ids the list of ids to match the query with
      */
-    @PostMapping("/transactionRequests/export")
+    @PostMapping(OperationsConstants.API_TRANSACTION_PATH + "/export")
     public Map<String, String> filterTransactionRequests(
             HttpServletResponse response,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,

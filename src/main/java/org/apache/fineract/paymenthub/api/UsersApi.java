@@ -22,8 +22,7 @@ import org.apache.fineract.organisation.role.Role;
 import org.apache.fineract.organisation.role.RoleRepository;
 import org.apache.fineract.organisation.user.AppUser;
 import org.apache.fineract.organisation.user.AppUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +34,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -44,24 +47,21 @@ import static java.util.stream.Collectors.toList;
 import static org.apache.fineract.paymenthub.api.AssignmentAction.ASSIGN;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value=OperationsConstants.API_VERSION_PATH, produces=MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
+@Profile(OperationsConstants.API_STANDALONE_LOCAL)
 public class UsersApi {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final AppUserRepository appuserRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private AppUserRepository appuserRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @GetMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = OperationsConstants.API_USERS_PATH, produces = MediaType.APPLICATION_JSON)
     public List<AppUser> retrieveAll() {
         return this.appuserRepository.findAll();
     }
 
-    @GetMapping(path = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = OperationsConstants.API_USERS_PATH + "/{userId}", produces = MediaType.APPLICATION_JSON)
     public AppUser retrieveOne(@PathVariable("userId") Long userId, HttpServletResponse response) {
         Optional<AppUser> optEntity = appuserRepository.findById(userId);
         if (optEntity.isPresent()) {
@@ -72,7 +72,7 @@ public class UsersApi {
         }
     }
 
-    @GetMapping(path = "/user/{userId}/roles", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = OperationsConstants.API_USERS_PATH + "/{userId}/roles", produces = MediaType.APPLICATION_JSON)
     public Collection<Role> retrieveRoles(@PathVariable("userId") Long userId, HttpServletResponse response) {
         Optional<AppUser> optEntity = appuserRepository.findById(userId);
         if (optEntity.isPresent()) {
@@ -83,7 +83,7 @@ public class UsersApi {
         }
     }
 
-    @PostMapping(path = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = OperationsConstants.API_USERS_PATH, consumes = MediaType.APPLICATION_JSON)
     public void create(@RequestBody AppUser appUser, HttpServletResponse response) {
         AppUser existing = appuserRepository.findAppUserByName(appUser.getUsername());
         if (existing == null) {
@@ -96,7 +96,7 @@ public class UsersApi {
         }
     }
 
-    @PutMapping(path = "/user/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = OperationsConstants.API_USERS_PATH + "/{userId}", consumes = MediaType.APPLICATION_JSON)
     public void update(@PathVariable("userId") Long userId, @RequestBody AppUser appUser, HttpServletResponse response) {
         Optional<AppUser> optEntity = appuserRepository.findById(userId);
         if (optEntity.isPresent()) {
@@ -110,7 +110,7 @@ public class UsersApi {
         }
     }
 
-    @DeleteMapping(path = "/user/{userId}", produces = MediaType.TEXT_HTML_VALUE)
+    @DeleteMapping(path = OperationsConstants.API_USERS_PATH + "/{userId}", produces = MediaType.TEXT_HTML)
     public void delete(@PathVariable("userId") Long userId, HttpServletResponse response) {
         Optional<AppUser> optEntity = appuserRepository.findById(userId);
         if (optEntity.isPresent()) {
@@ -120,7 +120,7 @@ public class UsersApi {
         }
     }
 
-    @PutMapping(path = "/user/{userId}/roles", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = OperationsConstants.API_USERS_PATH + "/{userId}/roles", consumes = MediaType.APPLICATION_JSON)
     public void userAssignment(@PathVariable("userId") Long userId, @RequestParam("action") AssignmentAction action,
                                @RequestBody EntityAssignments assignments, HttpServletResponse response) {
         Optional<AppUser> optEntity = appuserRepository.findById(userId);

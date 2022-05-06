@@ -1,12 +1,14 @@
 package org.apache.fineract.paymenthub.api;
 
 import org.apache.fineract.paymenthub.domain.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import lombok.RequiredArgsConstructor;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -16,35 +18,31 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value = OperationsConstants.API_VERSION_PATH, produces = MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
 public class BatchApi {
 
-    private final static String API_PATH = "/batch";
-
-    @Autowired
-    private TransferRepository transferRepository;
-
-    @Autowired
-    private BatchRepository batchRepository;
+    private final TransferRepository transferRepository;
+    private final BatchRepository batchRepository;
 
     /*
-    @Autowired
-    @Qualifier("awsStorage")
-    private FileTransferService fileTransferService;
-    */
+     * @Qualifier("awsStorage")
+     * private FileTransferService fileTransferService;
+     */
 
     @Value("${application.bucket-name}")
     private String bucketName;
 
-
-    @GetMapping(API_PATH)
+    @GetMapping(OperationsConstants.API_BATCH_PATH)
     public BatchDTO batchDetails(@RequestParam(value = "batchId", required = false) String batchId,
-                                 @RequestParam(value = "requestId", required = false) String requestId) {
+            @RequestParam(value = "requestId", required = false) String requestId) {
         Batch batch = batchRepository.findByBatchId(batchId);
         if (batch != null) {
             if (batch.getResultGeneratedAt() != null) {
-//                Checks if last status was checked before 10 mins
+                // Checks if last status was checked before 10 mins
                 if (new Date().getTime() - batch.getResultGeneratedAt().getTime() < 600000) {
                     return generateDetails(batch);
                 } else {
@@ -56,21 +54,21 @@ public class BatchApi {
         } else {
             return null;
         }
-
     }
 
-    @GetMapping(API_PATH + "/detail")
+    @GetMapping(OperationsConstants.API_BATCH_PATH + "/detail")
     public ResponseEntity<List<Transfer>> batchDetails(@RequestParam(value = "batchId") String batchId,
-                                                       @RequestParam(value = "status", defaultValue = "ALL") String status,
-                                                       @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
-                                                       @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+            @RequestParam(value = "status", defaultValue = "ALL") String status,
+            @RequestParam(value = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
 
         List<Transfer> transfers;
 
         if (status.equalsIgnoreCase(TransferStatus.COMPLETED.toString()) ||
                 status.equalsIgnoreCase(TransferStatus.IN_PROGRESS.toString()) ||
                 status.equalsIgnoreCase(TransferStatus.FAILED.toString())) {
-            transfers = transferRepository.findAllByBatchIdAndStatus(batchId, status.toUpperCase(), PageRequest.of(pageNo, pageSize));
+            transfers = transferRepository.findAllByBatchIdAndStatus(batchId, status.toUpperCase(),
+                    PageRequest.of(pageNo, pageSize));
         } else {
             transfers = transferRepository.findAllByBatchId(batchId, PageRequest.of(pageNo, pageSize));
         }
@@ -78,13 +76,13 @@ public class BatchApi {
         return new ResponseEntity<List<Transfer>>(transfers, new HttpHeaders(), HttpStatus.OK);
     }
 
-    @GetMapping(API_PATH + "/transactions")
+    @GetMapping(OperationsConstants.API_BATCH_PATH + "/transactions")
     public HashMap<String, String> batchTransactionDetails(@RequestParam String batchId) {
         Batch batch = batchRepository.findByBatchId(batchId);
         if (batch != null) {
             List<Transfer> transfers = transferRepository.findAllByBatchId(batch.getBatchId());
             HashMap<String, String> status = new HashMap<>();
-            for(Transfer transfer: transfers){
+            for (Transfer transfer : transfers) {
                 status.put(transfer.getTransactionId(), transfer.getStatus().name());
             }
             return status;
@@ -93,8 +91,7 @@ public class BatchApi {
         }
     }
 
-    private BatchDTO generateDetails (Batch batch) {
-
+    private BatchDTO generateDetails(Batch batch) {
         List<Transfer> transfers = transferRepository.findAllByBatchId(batch.getBatchId());
 
         Long completed = 0L;
@@ -106,7 +103,7 @@ public class BatchApi {
         BigDecimal ongoingAmount = BigDecimal.ZERO;
         BigDecimal failedAmount = BigDecimal.ZERO;
 
-        for(int i=0; i<transfers.size(); i++) {
+        for (int i = 0; i < transfers.size(); i++) {
             total++;
             BigDecimal amount = transfers.get(i).getAmount();
             totalAmount = totalAmount.add(amount);
@@ -136,18 +133,13 @@ public class BatchApi {
                 ongoingAmount, failedAmount, batch.getResult_file(), batch.getResultGeneratedAt(), batch.getNote());
     }
 
-//    private BatchDTO transformBatchResponse(Batch batch) {
-//        return new BatchDTO(batch.getBatchId(), batch.getRequestId(), batch.getTotalTransactions(), batch.getOngoing(), batch.getFailed(), batch.getCompleted(), batch.getResult_file(), batch.getResultGeneratedAt(), batch.getNote());
-//    }
-
     private String createDetailsFile(List<Transfer> transfers) {
         String CSV_SEPARATOR = ",";
         File tempFile = new File(System.currentTimeMillis() + "_response.csv");
         try (
                 FileWriter writer = new FileWriter(tempFile.getName());
                 BufferedWriter bw = new BufferedWriter(writer)) {
-            for (Transfer transfer : transfers)
-            {
+            for (Transfer transfer : transfers) {
                 StringBuffer oneLine = new StringBuffer();
                 oneLine.append(transfer.getTransactionId());
                 oneLine.append(CSV_SEPARATOR);
@@ -181,5 +173,4 @@ public class BatchApi {
         }
         return null;
     }
-
 }

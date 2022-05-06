@@ -5,32 +5,30 @@ import org.apache.fineract.paymenthub.domain.CurrencyRate;
 import org.apache.fineract.paymenthub.domain.CurrencyRateLock;
 import org.apache.fineract.paymenthub.domain.CurrencyRateLockRepository;
 import org.apache.fineract.paymenthub.domain.CurrencyRateRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import lombok.RequiredArgsConstructor;
+
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
+
 import java.math.BigDecimal;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value=OperationsConstants.API_VERSION_PATH, produces=MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
 public class IMUConversionApi {
 
-    private final static String API_PATH = "/imuexchange";
-
-    @Autowired
-    private CurrencyRateRepository currencyRateRepository;
-
-    @Autowired
-    private CurrencyRateLockRepository currencyRateLockRepository;
+    private final CurrencyRateRepository currencyRateRepository;
+    private final CurrencyRateLockRepository currencyRateLockRepository;
 
     @Value("${config.imu.rate-validity-seconds}")
     private Integer imuRateValidSeconds;
 
-    @PostMapping(path = API_PATH + "/preview", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = OperationsConstants.API_IMUC_PATH + "/preview", consumes = MediaType.APPLICATION_JSON,
+            produces = MediaType.APPLICATION_JSON)
     public IMUConversionData create(@RequestBody IMUConversionData imuConversion, HttpServletResponse response) {
         Date currentDate = new Date();
         Date expireBy = this.getExpireBy(currentDate);
@@ -79,7 +77,7 @@ public class IMUConversionApi {
         return imuConversion;
     }
 
-    @PostMapping(path = API_PATH + "/master", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = OperationsConstants.API_IMUC_PATH + "/master", consumes = MediaType.APPLICATION_JSON)
     public void create(@RequestBody List<IMUConversionData> exchangeRates, HttpServletResponse response) {
 
         List<CurrencyRate> currencyRates = new ArrayList<>();
@@ -99,7 +97,7 @@ public class IMUConversionApi {
         currencyRateRepository.saveAll(currencyRates);
     }
 
-    @DeleteMapping(path = API_PATH + "/master", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = OperationsConstants.API_IMUC_PATH + "/master", consumes = MediaType.APPLICATION_JSON)
     public void delete(@RequestBody IMUConversionData imuConversion, HttpServletResponse response) {
         CurrencyRate exchange = currencyRateRepository.findOneByFromCurrencyAndToCurrency(imuConversion.getFrom(), imuConversion.getTo());
         if (exchange != null) {
