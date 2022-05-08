@@ -1,25 +1,25 @@
 package org.apache.fineract.infrastructure.security.filter;
 
 import java.io.IOException;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.fineract.core.domain.FineractPlatformTenant;
-import org.apache.fineract.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.core.serialization.ToApiJsonSerializer;
+import org.apache.fineract.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.data.PlatformRequestLog;
 import org.apache.fineract.infrastructure.security.exception.InvalidTenantIdentiferException;
 import org.apache.fineract.infrastructure.security.service.BasicAuthTenantDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
