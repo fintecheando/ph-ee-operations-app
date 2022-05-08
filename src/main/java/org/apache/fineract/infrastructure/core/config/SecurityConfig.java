@@ -1,5 +1,7 @@
 package org.apache.fineract.infrastructure.core.config;
 
+import java.util.Arrays;
+
 import org.apache.fineract.infrastructure.security.filter.TenantAwareBasicAuthenticationFilter;
 import org.apache.fineract.infrastructure.security.service.TenantAwareJpaPlatformUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @ConditionalOnProperty("fineract.security.basicauth.enabled")
@@ -32,20 +37,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http //
-                .csrf().disable() // NOSONAR only creating a service that is used by non-browser clients
-                .antMatcher("/api/**").authorizeRequests() //
-                .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll() //
-                .antMatchers(HttpMethod.POST, "/api/*/echo").permitAll() //
-                .antMatchers("/actuator/**").permitAll() //
-                .antMatchers("/api/*/twofactor").fullyAuthenticated() //
-                .antMatchers("/api/**").access("isFullyAuthenticated()").and() //
-                .httpBasic() //
-                .authenticationEntryPoint(basicAuthenticationEntryPoint()) //
-                .and() //
-                .sessionManagement() //
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //
-                .and() //
-                .addFilterAfter(tenantAwareBasicAuthenticationFilter(), SecurityContextPersistenceFilter.class); //
+            .cors().and()
+            .csrf().disable() // NOSONAR only creating a service that is used by non-browser clients
+            .antMatcher("/api/**").authorizeRequests() //
+            .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll() //
+            .antMatchers(HttpMethod.POST, "/api/*/echo").permitAll() //
+            .antMatchers("/actuator/**").permitAll() //
+            .antMatchers("/api/*/twofactor").fullyAuthenticated() //
+            .antMatchers("/api/**").access("isFullyAuthenticated()").and() //
+            .httpBasic() //
+            .authenticationEntryPoint(basicAuthenticationEntryPoint()) //
+            .and() //
+            .sessionManagement() //
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS) //
+            .and() //
+            .addFilterAfter(tenantAwareBasicAuthenticationFilter(), SecurityContextPersistenceFilter.class); //
 
         /*
         if (serverProperties.getSsl().isEnabled()) {
@@ -98,5 +104,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 tenantAwareBasicAuthenticationFilter());
         registration.setEnabled(false);
         return registration;
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        // or any domain that you want to restrict to
+        configuration.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Authorization", "fineract-platform-tenantid"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Add the method support as you like
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
