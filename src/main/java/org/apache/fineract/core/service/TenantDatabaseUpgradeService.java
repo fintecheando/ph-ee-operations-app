@@ -86,7 +86,7 @@ public class TenantDatabaseUpgradeService implements InitializingBean {
                 return;
             }
             try {
-                upgradeTenantStore();
+                // upgradeTenantStore();
                 upgradeIndividualTenants();
             } catch (LiquibaseException e) {
                 throw new RuntimeException("Error while migrating the schema", e);

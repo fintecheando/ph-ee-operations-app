@@ -46,7 +46,7 @@ dependencies {
         'org.hibernate:hibernate-jpamodelgen:5.4.17.Final',
         'org.apache.commons:commons-lang3:3.3.2',
         'com.zaxxer:HikariCP:3.4.5',
-        'mysql:mysql-connector-java:8.0.28',
+        'mysql:mysql-connector-java:8.0.29',
         'net.sf.ehcache:ehcache:2.10.6',
         'net.sf.supercsv:super-csv:2.4.0',
         'com.amazonaws:aws-java-sdk:1.11.486',
