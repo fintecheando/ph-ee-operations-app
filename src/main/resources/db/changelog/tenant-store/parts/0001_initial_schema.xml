@@ -36,7 +36,7 @@
             <column defaultValue="3306" name="schema_server_port" type="VARCHAR(10)">
                 <constraints nullable="false"/>
             </column>
-            <column defaultValue="root" name="schema_username" type="VARCHAR(100)">
+            <column defaultValue="skdcnwauicn2ucnaecasdsajdnizucawencascdca" name="schema_username" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
             <column defaultValue="mysql" name="schema_password" type="VARCHAR(100)">
